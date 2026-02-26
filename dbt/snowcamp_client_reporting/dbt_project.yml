@@ -1,0 +1,25 @@
+name: 'snowcamp_client_reporting'
+version: '1.0.0'
+config-version: 2
+
+profile: 'snowcamp'
+
+model-paths: ["models"]
+test-paths: ["tests"]
+target-path: "target"
+clean-targets: ["target", "dbt_packages"]
+
+models:
+  snowcamp_client_reporting:
+    staging:
+      +database: SNOWCAMP_LAB
+      +schema: ANALYTICS
+      +materialized: view
+    intermediate:
+      +database: SNOWCAMP_LAB
+      +schema: ANALYTICS
+      +materialized: table
+    marts:
+      +database: SNOWCAMP_LAB
+      +schema: MARTS
+      +materialized: table

@@ -1,0 +1,20 @@
+version: 2
+
+sources:
+  - name: raw
+    database: SNOWCAMP_LAB
+    schema: RAW
+    description: "Raw synthetic asset management data generated in the SnowCamp lab"
+    tables:
+      - name: clients
+        description: "Institutional clients with region and AUM classification"
+      - name: portfolios
+        description: "Investment portfolios linked to clients"
+      - name: securities
+        description: "Tradeable securities with sector and asset class"
+      - name: holdings
+        description: "Daily portfolio holdings (position-level)"
+      - name: transactions
+        description: "Trade executions (buys and sells)"
+      - name: benchmarks
+        description: "Daily benchmark index returns"
