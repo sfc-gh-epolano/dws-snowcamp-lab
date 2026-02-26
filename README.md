@@ -46,11 +46,31 @@ ALTER GIT REPOSITORY SNOWCAMP_LAB.RAW.SNOWCAMP_GIT_REPO FETCH;
 
 ### 3. Import the notebook
 
-1. Navigate to **Projects** > **Notebooks** in the left sidebar
-2. Click **Create from Repository**
-3. Select `SNOWCAMP_GIT_REPO` and choose `notebooks/DWS_SnowCamp_Lab.ipynb`
-4. Select the `ACCOUNTADMIN` role and `WH_LAB` warehouse
-5. Click **Create**
+1. Navigate to **Projects** > **Notebooks** in the left sidebar and click the **+** button, then select **Create from Repository**
+
+![Create notebook from repository](docs/images/01_create_from_repo.png)
+
+2. Click **Select .ipynb file** to open the file picker. You will be prompted to select the database that contains your Git repository.
+
+![Select database](docs/images/02_select_database.png)
+
+3. Select `SNOWCAMP_LAB` from the database dropdown. You will see `SNOWCAMP_GIT_REPO` appear in the left panel. Click on it.
+
+![Database selected](docs/images/03_database_selected.png)
+
+4. The repository contents will load. You should see the `dbt`, `notebooks`, and `streamlit` folders.
+
+![Repository contents](docs/images/04_repo_contents.png)
+
+5. Click the **notebooks** folder.
+
+![Click notebooks folder](docs/images/05_click_notebooks.png)
+
+6. Select `DWS_SnowCamp_Lab.ipynb` and click **Select file**.
+
+![Select notebook file](docs/images/06_select_notebook.png)
+
+7. Back in the create dialog, set the **Query warehouse** to `WH_LAB` and confirm the role is `ACCOUNTADMIN`. Click **Create**.
 
 ### 4. Run the lab
 
