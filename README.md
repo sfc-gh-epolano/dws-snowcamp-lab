@@ -21,6 +21,10 @@ Use the credentials provided at registration.
 Open a **SQL Worksheet** in Snowsight and run:
 
 ```sql
+-- Create the lab database (the Git Repository object needs a database to live in)
+CREATE DATABASE IF NOT EXISTS SNOWCAMP_LAB;
+CREATE SCHEMA IF NOT EXISTS SNOWCAMP_LAB.RAW;
+
 -- Allow Snowflake to connect to GitHub
 CREATE OR REPLACE API INTEGRATION snowcamp_git_api
     API_PROVIDER         = git_https_api
@@ -28,11 +32,11 @@ CREATE OR REPLACE API INTEGRATION snowcamp_git_api
     ENABLED              = TRUE;
 
 -- Point to this repository
-CREATE OR REPLACE GIT REPOSITORY SNOWCAMP_GIT_REPO
+CREATE OR REPLACE GIT REPOSITORY SNOWCAMP_LAB.RAW.SNOWCAMP_GIT_REPO
     API_INTEGRATION = snowcamp_git_api
     ORIGIN          = 'https://github.com/sfc-gh-epolano/dws-snowcamp-lab.git';
 
-ALTER GIT REPOSITORY SNOWCAMP_GIT_REPO FETCH;
+ALTER GIT REPOSITORY SNOWCAMP_LAB.RAW.SNOWCAMP_GIT_REPO FETCH;
 ```
 
 ### 3. Import the notebook
