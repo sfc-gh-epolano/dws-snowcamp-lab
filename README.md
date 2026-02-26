@@ -21,9 +21,14 @@ Use the credentials provided at registration.
 Open a **SQL Worksheet** in Snowsight and run:
 
 ```sql
--- Create the lab database (the Git Repository object needs a database to live in)
+-- Create the lab database and warehouse
 CREATE DATABASE IF NOT EXISTS SNOWCAMP_LAB;
 CREATE SCHEMA IF NOT EXISTS SNOWCAMP_LAB.RAW;
+
+CREATE WAREHOUSE IF NOT EXISTS WH_LAB
+    WAREHOUSE_SIZE = 'XSMALL'
+    AUTO_SUSPEND   = 60
+    AUTO_RESUME    = TRUE;
 
 -- Allow Snowflake to connect to GitHub
 CREATE OR REPLACE API INTEGRATION snowcamp_git_api
@@ -44,7 +49,7 @@ ALTER GIT REPOSITORY SNOWCAMP_LAB.RAW.SNOWCAMP_GIT_REPO FETCH;
 1. Navigate to **Projects** > **Notebooks** in the left sidebar
 2. Click **Create from Repository**
 3. Select `SNOWCAMP_GIT_REPO` and choose `notebooks/DWS_SnowCamp_Lab.ipynb`
-4. Select the `ACCOUNTADMIN` role and `COMPUTE_WH` (or any available warehouse)
+4. Select the `ACCOUNTADMIN` role and `WH_LAB` warehouse
 5. Click **Create**
 
 ### 4. Run the lab
