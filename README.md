@@ -8,7 +8,7 @@ A 1.5-hour hands-on lab for the DWS SnowCamp training event. Attendees build a c
 
 - A **Snowflake Trial account** (provided via HOL infrastructure on the day)
 - A modern web browser (Chrome, Edge, or Firefox recommended)
-- **Cybersyn Financial & Economic Essentials** (free Marketplace listing -- installed in step 1b below)
+- **Snowflake Public Data (Free)** Marketplace listing (installed in step 1b below)
 - No local software installation required -- everything runs inside Snowsight
 
 ## Quick Start
@@ -17,14 +17,27 @@ A 1.5-hour hands-on lab for the DWS SnowCamp training event. Attendees build a c
 
 Use the credentials provided at registration.
 
-### 1b. Install Cybersyn Financial & Economic Essentials from Marketplace
+### 1b. Install Snowflake Public Data (Free) from Marketplace
 
 This free dataset provides real NASDAQ stock prices that the lab joins with synthetic holdings.
 
 1. In Snowsight, navigate to **Data Products** > **Marketplace**
-2. Search for **Cybersyn Financial Economic Essentials**
-3. Click **Get** and accept the terms (no cost)
-4. The database `FINANCIAL__ECONOMIC_ESSENTIALS` will appear in your account
+
+![Navigate to Marketplace](docs/images/07_marketplace_search.png)
+
+2. Search for **Snowflake Public Data** and click on the **Snowflake Public Data (Free)** listing from **Snowflake Public Data Products**
+
+![Snowflake Public Data listing](docs/images/08_snowflake_public_data_listing.png)
+
+3. Click **Get** to open the install dialog
+
+![Get listing](docs/images/09_get_listing.png)
+
+4. Expand **Options** and confirm the database name is `FINANCIAL__ECONOMIC_ESSENTIALS`. Click **Get** to install.
+
+![Get listing with options](docs/images/10_get_listing_options.png)
+
+5. The database `FINANCIAL__ECONOMIC_ESSENTIALS` will appear in your account with no storage cost
 
 ### 2. Create a Git Repository integration
 
@@ -94,7 +107,7 @@ Execute cells sequentially from top to bottom. Each section includes instruction
 
 | Part | Topic | Duration | What You Build |
 |------|-------|----------|----------------|
-| 1 | Environment Setup, Synthetic Data & Marketplace | 20 min | Database, schemas, warehouse, 6 raw tables, Cybersyn install |
+| 1 | Environment Setup, Synthetic Data & Marketplace | 20 min | Database, schemas, warehouse, 6 raw tables, Marketplace install |
 | 2 | dbt Transformation | 30 min | Staging, intermediate, mart layers, dbt tests, project deployment, Marketplace join |
 | 3 | Streamlit Dashboard | 20 min | Interactive client-reporting app with real market data |
 | 4 | Internal Marketplace & Horizon | 5 min | Horizon tags, share, and data product listing |
@@ -112,7 +125,7 @@ dws-snowcamp-lab/
 │       ├── dbt_project.yml
 │       ├── profiles.yml                  # Snowflake connection targets (dev/prod)
 │       └── models/
-│           ├── staging/                   # Views: clean raw data + Cybersyn market prices
+│           ├── staging/                   # Views: clean raw data + Marketplace market prices
 │           ├── intermediate/              # Tables: join and enrich
 │           └── marts/                     # Tables: facts, dimensions, and Marketplace join
 └── streamlit/
@@ -142,7 +155,7 @@ RAW.CLIENTS (30 rows)           RAW.SECURITIES (200 rows)
         │
         └──> MARTS.F_POSITIONS_DAILY (fact)
              MARTS.F_PERFORMANCE_DAILY (fact)
-             MARTS.F_HOLDINGS_WITH_MARKET_DATA (fact + Cybersyn Marketplace)
+             MARTS.F_HOLDINGS_WITH_MARKET_DATA (fact + Snowflake Marketplace)
              MARTS.D_PORTFOLIO (dimension)
              MARTS.D_CLIENT (dimension)
 ```
@@ -164,7 +177,7 @@ RAW.CLIENTS (30 rows)           RAW.SECURITIES (200 rows)
 | CREATE DBT PROJECT | https://docs.snowflake.com/en/sql-reference/sql/create-dbt-project |
 | EXECUTE DBT PROJECT | https://docs.snowflake.com/en/sql-reference/sql/execute-dbt-project |
 | Deploy dbt Projects | https://docs.snowflake.com/en/user-guide/data-engineering/dbt-projects-on-snowflake-deploy |
-| Cybersyn Marketplace Listing | https://app.snowflake.com/marketplace/listing/GZTSZAS2KF7 |
+| Snowflake Public Data (Free) | https://app.snowflake.com/marketplace/listing/GZTSZAS2KCS |
 | OpenFlow (reference only) | https://docs.snowflake.com/en/user-guide/data-load-openflow |
 
 ## Context: DWS SnowCamp

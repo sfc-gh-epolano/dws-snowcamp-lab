@@ -99,9 +99,9 @@ if not perf_df.empty:
     st.line_chart(chart_data)
 
 # ---------------------------------------------------------------------------
-# Mark-to-Market: Real prices from Cybersyn Marketplace
+# Mark-to-Market: Real prices from Snowflake Marketplace
 # ---------------------------------------------------------------------------
-st.subheader("Mark-to-Market: Real vs Synthetic Prices (Cybersyn Marketplace)")
+st.subheader("Mark-to-Market: Real vs Synthetic Prices (Snowflake Marketplace)")
 st.caption("Synthetic holdings enriched with real NASDAQ closing prices via Snowflake Marketplace")
 
 mtm_df = session.sql(f"""
@@ -128,7 +128,7 @@ if not mtm_df.empty:
     st.bar_chart(mtm_df.set_index("TICKER")[["SYNTHETIC_VALUE", "MARKET_VALUE"]])
     st.dataframe(mtm_df, use_container_width=True)
 else:
-    st.info("Mark-to-market data requires the Cybersyn Financial & Economic Essentials Marketplace listing.")
+    st.info("Mark-to-market data requires the Snowflake Public Data (Free) Marketplace listing.")
 
 # ---------------------------------------------------------------------------
 # Holdings detail

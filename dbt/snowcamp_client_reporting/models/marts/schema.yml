@@ -28,7 +28,7 @@ models:
         tests: [not_null]
 
   - name: f_holdings_with_market_data
-    description: "Holdings enriched with real NASDAQ closing prices from Cybersyn Marketplace"
+    description: "Holdings enriched with real NASDAQ closing prices from Snowflake Marketplace"
     columns:
       - name: holding_id
         tests: [not_null]

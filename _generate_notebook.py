@@ -65,8 +65,8 @@ cells.append(md_cell("md_architecture", """\
 Source Data (Python)  \u2192  RAW schema  \u2192  ANALYTICS schema  \u2192  MARTS schema  \u2192  Streamlit App
                           (Bronze)        (Silver)              (Gold)           \u2193
                                                                        Marketplace Listing
-Cybersyn Marketplace  \u2192  ANALYTICS.STG_MARKET_PRICES  \u2192  MARTS.F_HOLDINGS_WITH_MARKET_DATA
-(Real NASDAQ prices)       (Staging view)                    (Joined with synthetic holdings)
+Snowflake Marketplace  \u2192  ANALYTICS.STG_MARKET_PRICES  \u2192  MARTS.F_HOLDINGS_WITH_MARKET_DATA
+(Real NASDAQ prices)        (Staging view)                    (Joined with synthetic holdings)
 ```
 
 **Three-Layer Architecture** (mirrors the DWS production design):
@@ -76,7 +76,7 @@ Cybersyn Marketplace  \u2192  ANALYTICS.STG_MARKET_PRICES  \u2192  MARTS.F_HOLDI
 | Bronze / Raw | `RAW` | Synthetic data mimicking on-prem sources |
 | Silver / Curated | `ANALYTICS` | Staging views and intermediate tables |
 | Gold / Marts | `MARTS` | Business-ready fact and dimension tables |
-| Marketplace | `FINANCIAL__ECONOMIC_ESSENTIALS` | Real NASDAQ prices from Cybersyn (zero-copy) |
+| Marketplace | `FINANCIAL__ECONOMIC_ESSENTIALS` | Real NASDAQ prices from Snowflake Public Data (zero-copy) |
 
 > In a production DWS deployment, raw data arrives via \
 [OpenFlow](https://docs.snowflake.com/en/user-guide/data-load-openflow) \
@@ -90,8 +90,8 @@ cells.append(md_cell("md_part1", """\
 ---
 ## Part 1: Environment Setup, Synthetic Data & Marketplace (20 min)
 
-We will create the database and warehouse, install the **Cybersyn Financial & Economic \
-Essentials** free Marketplace listing, and generate synthetic asset-management data \
+We will create the database and warehouse, install the **Snowflake Public Data (Free)** \
+Marketplace listing, and generate synthetic asset-management data \
 using real NASDAQ tickers so we can join with real market prices later.
 
 > **Reference**: \
@@ -133,22 +133,34 @@ USE SCHEMA RAW;
 SELECT 'Environment ready!' AS status;"""))
 
 cells.append(md_cell("md_marketplace_install", """\
-### Install Cybersyn Financial & Economic Essentials (Free)
+### Install Snowflake Public Data (Free) from Marketplace
 
-Before generating data, let's install a **free Marketplace listing** that provides \
+Before generating data, let\u2019s install a **free Marketplace listing** that provides \
 real NASDAQ stock prices. We will join this with our synthetic holdings later.
 
 1. In Snowsight, navigate to **Data Products** \u2192 **Marketplace**
-2. Search for **Cybersyn Financial Economic Essentials**
-3. Click **Get** and accept the terms (no cost)
-4. The database `FINANCIAL__ECONOMIC_ESSENTIALS` will appear in your account
+
+![Navigate to Marketplace](docs/images/07_marketplace_search.png)
+
+2. Search for **Snowflake Public Data** and click on the **Snowflake Public Data (Free)** listing
+
+![Snowflake Public Data listing](docs/images/08_snowflake_public_data_listing.png)
+
+3. Click **Get** to open the install dialog
+
+![Get listing](docs/images/09_get_listing.png)
+
+4. Expand **Options**, confirm the database name is `FINANCIAL__ECONOMIC_ESSENTIALS`, then click **Get**
+
+![Get listing with options](docs/images/10_get_listing_options.png)
+
+5. The database will appear in your account with **no storage cost** (zero-copy data sharing)
 
 > **Reference**: \
-[Snowflake Marketplace](https://docs.snowflake.com/en/user-guide/data-marketplace) | \
-[Cybersyn Listing](https://app.snowflake.com/marketplace/listing/GZTSZAS2KF7)"""))
+[Snowflake Marketplace](https://docs.snowflake.com/en/user-guide/data-marketplace)"""))
 
 cells.append(sql_cell("sql_validate_cybersyn", """\
--- Validate that the Cybersyn data is accessible
+-- Validate that the Marketplace data is accessible
 -- You should see stock price records with tickers, dates, and prices
 SELECT primary_ticker, variable_name, date, value
 FROM FINANCIAL__ECONOMIC_ESSENTIALS.PUBLIC_DATA_FREE.STOCK_PRICE_TIMESERIES
@@ -386,7 +398,7 @@ Now we transform the raw data into analytics-ready tables using the \
 
 | Layer | Purpose | Materialisation |
 |-------|---------|-----------------|
-| **Staging** | Clean, rename, type-cast raw sources + Cybersyn | Views |
+| **Staging** | Clean, rename, type-cast raw sources + Marketplace data | Views |
 | **Intermediate** | Join, enrich, calculate | Tables |
 | **Marts** | Business-ready fact & dimension tables | Tables |
 
@@ -402,7 +414,7 @@ cells.append(md_cell("md_staging", """\
 ### 2a. Staging Layer (Views)
 
 Staging models clean and rename columns without joining across sources. \
-We also create a staging view over the **Cybersyn Marketplace data** \
+We also create a staging view over the **Snowflake Public Data** \
 to extract NASDAQ closing prices."""))
 
 cells.append(sql_cell("sql_staging", """\
@@ -430,7 +442,7 @@ CREATE OR REPLACE VIEW STG_SECURITIES AS
 SELECT security_id, ticker, isin, security_name, sector, asset_class, currency
 FROM SNOWCAMP_LAB.RAW.SECURITIES;
 
--- Staging: Cybersyn Marketplace closing prices
+-- Staging: Marketplace closing prices (Snowflake Public Data)
 CREATE OR REPLACE VIEW STG_MARKET_PRICES AS
 SELECT
     primary_ticker AS ticker,
@@ -440,7 +452,7 @@ FROM FINANCIAL__ECONOMIC_ESSENTIALS.PUBLIC_DATA_FREE.STOCK_PRICE_TIMESERIES
 WHERE variable_name = 'Post-Market Close'
   AND value IS NOT NULL;
 
-SELECT 'Staging views created (including Cybersyn Marketplace)!' AS status;"""))
+SELECT 'Staging views created (including Marketplace prices)!' AS status;"""))
 
 cells.append(md_cell("md_intermediate", """\
 ### 2b. Intermediate Layer (Tables)
@@ -475,7 +487,7 @@ Mart tables are **business-ready data products**:
 
 - `F_POSITIONS_DAILY` \u2014 Daily holdings with full context
 - `F_PERFORMANCE_DAILY` \u2014 Portfolio returns vs benchmark
-- `F_HOLDINGS_WITH_MARKET_DATA` \u2014 Holdings joined with **real NASDAQ prices** from Cybersyn
+- `F_HOLDINGS_WITH_MARKET_DATA` \u2014 Holdings joined with **real NASDAQ prices** from Marketplace
 - `D_PORTFOLIO`, `D_CLIENT` \u2014 Dimension tables
 
 > **Reference**: \
@@ -537,11 +549,11 @@ cells.append(md_cell("md_marketplace_join", """\
 This is the key **Snowflake Marketplace value proposition**: joining your internal data \
 with third-party data via **zero-copy data sharing** \u2014 no ETL, no data movement.
 
-We join our synthetic holdings with **real NASDAQ closing prices** from Cybersyn to \
+We join our synthetic holdings with **real NASDAQ closing prices** from the Marketplace to \
 create a mark-to-market view."""))
 
 cells.append(sql_cell("sql_marketplace_mart", """\
--- Fact: Holdings enriched with real NASDAQ prices from Cybersyn Marketplace
+-- Fact: Holdings enriched with real NASDAQ prices from Snowflake Marketplace
 CREATE OR REPLACE TABLE SNOWCAMP_LAB.MARTS.F_HOLDINGS_WITH_MARKET_DATA AS
 SELECT
     p.holding_id, p.portfolio_id, p.client_id,
@@ -596,7 +608,7 @@ you get:
 - **Scheduling** via Snowflake Tasks for production pipelines
 
 This lab\u2019s GitHub repo contains a full dbt project at `dbt/snowcamp_client_reporting/` \
-with all the models you just ran manually, **plus** schema tests and a Cybersyn staging model.
+with all the models you just ran manually, **plus** schema tests and a Marketplace data staging model.
 
 > **Reference**: \
 [dbt Projects on Snowflake](https://docs.snowflake.com/en/user-guide/ui-snowsight/dbt) | \
@@ -726,7 +738,7 @@ To see the full dependency graph of your dbt project:
 
 The DAG shows how data flows from `RAW` sources through `STG_*` staging views, \
 `INT_*` intermediate tables, and into `F_*` / `D_*` mart tables \u2014 including the \
-Cybersyn Marketplace join.
+Marketplace data join.
 
 > **Reference**: \
 [Supported dbt commands](https://docs.snowflake.com/en/user-guide/data-engineering/dbt-projects-on-snowflake-supported-commands) | \
@@ -742,7 +754,7 @@ cells.append(md_cell("md_part3", """\
 
 Now let\u2019s turn the mart tables into an **interactive client-reporting dashboard** \
 using **Streamlit in Snowflake**. The dashboard includes a section showing \
-**real market prices** from the Cybersyn Marketplace join.
+**real market prices** from the Snowflake Marketplace join.
 
 > **Reference**: \
 [Streamlit in Snowflake](https://docs.snowflake.com/en/developer-guide/streamlit/about-streamlit) | \
@@ -799,8 +811,8 @@ aum_region = session.sql(f'''
 ''').to_pandas()
 st.bar_chart(aum_region.set_index("REGION"))
 
-# ---- Mark-to-Market: Real Prices from Cybersyn ----
-st.subheader("Mark-to-Market: Real vs Synthetic (Cybersyn Marketplace)")
+# ---- Mark-to-Market: Real Prices from Snowflake Marketplace ----
+st.subheader("Mark-to-Market: Real vs Synthetic (Snowflake Marketplace)")
 mtm = session.sql(f'''
     SELECT ticker, security_name,
            SUM(quantity) AS total_qty,
@@ -861,7 +873,7 @@ cells.append(md_cell("md_part4", """\
 ---
 ## Part 4: Internal Marketplace & Horizon Catalog (5 min)
 
-You already installed Cybersyn from the Marketplace in Part 1 and joined it \
+You already installed Snowflake Public Data from the Marketplace in Part 1 and joined it \
 with your data in Part 2. Now let\u2019s **tag and publish** your own data product.
 
 > **Reference**: \
@@ -1001,7 +1013,7 @@ You have built an **end-to-end client-reporting data product** on Snowflake:
 | Step | What You Built |
 |------|---------------|
 | **Synthetic Data** | 6 raw tables with real NASDAQ tickers |
-| **Marketplace** | Joined with Cybersyn real stock prices (zero-copy) |
+| **Marketplace** | Joined with real NASDAQ stock prices (zero-copy) |
 | **dbt Transformation** | Staging \u2192 Intermediate \u2192 Marts with automated tests |
 | **dbt Deployment** | Deployed as a dbt Project object with scheduling |
 | **Streamlit Dashboard** | Interactive app with real market data |
@@ -1017,7 +1029,7 @@ You have built an **end-to-end client-reporting data product** on Snowflake:
 | CREATE DBT PROJECT | [docs.snowflake.com/...create-dbt-project](https://docs.snowflake.com/en/sql-reference/sql/create-dbt-project) |
 | Streamlit in Snowflake | [docs.snowflake.com/...streamlit](https://docs.snowflake.com/en/developer-guide/streamlit/about-streamlit) |
 | Horizon Catalog | [docs.snowflake.com/...horizon](https://docs.snowflake.com/en/user-guide/governance-horizon) |
-| Cybersyn Marketplace | [app.snowflake.com/marketplace/...](https://app.snowflake.com/marketplace/listing/GZTSZAS2KF7) |
+| Snowflake Public Data (Free) | [Snowflake Marketplace](https://app.snowflake.com/marketplace/listing/GZTSZAS2KCS) |
 | ACCOUNT_USAGE | [docs.snowflake.com/...account-usage](https://docs.snowflake.com/en/sql-reference/account-usage) |
 | Cortex Code | [docs.snowflake.com/...cortex-code](https://docs.snowflake.com/en/user-guide/ui-snowsight/cortex-code) |
 

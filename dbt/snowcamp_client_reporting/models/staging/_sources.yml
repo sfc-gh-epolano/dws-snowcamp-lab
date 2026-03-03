@@ -22,7 +22,7 @@ sources:
   - name: cybersyn
     database: FINANCIAL__ECONOMIC_ESSENTIALS
     schema: PUBLIC_DATA_FREE
-    description: "Cybersyn Financial & Economic Essentials (Snowflake Marketplace - free)"
+    description: "Snowflake Public Data (Free) - real NASDAQ stock prices from Snowflake Marketplace"
     tables:
       - name: stock_price_timeseries
         description: "NASDAQ stock prices (open, close, high, low, volume) for all US equities and ETFs"
