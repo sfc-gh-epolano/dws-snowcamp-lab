@@ -30,6 +30,10 @@ CREATE WAREHOUSE IF NOT EXISTS WH_LAB
     AUTO_SUSPEND   = 60
     AUTO_RESUME    = TRUE;
 
+-- Enable cross-region inference for Cortex AI features
+-- (trial accounts may not have all models available in their region)
+ALTER ACCOUNT SET CORTEX_ENABLED_CROSS_REGION = 'ANY_REGION';
+
 -- Allow Snowflake to connect to GitHub
 CREATE OR REPLACE API INTEGRATION snowcamp_git_api
     API_PROVIDER         = git_https_api
