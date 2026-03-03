@@ -2,14 +2,23 @@
 
 **Building an End-to-End Client Reporting Data Product on Snowflake**
 
-A 1.5-hour hands-on lab for the DWS SnowCamp training event. Attendees build a complete data-product pipeline in their own Snowflake trial account: synthetic data generation, dbt transformation, Streamlit dashboard, Internal Marketplace listing, and platform administration.
+A two-session hands-on lab for the DWS SnowCamp training event. Attendees build a complete data-product pipeline in their own Snowflake trial account: synthetic data generation, dbt transformation and orchestration, Streamlit dashboard, Internal Marketplace listing, platform administration, and AI-assisted development with Cortex Code.
 
 ## Prerequisites
 
 - A **Snowflake Trial account** (provided via HOL infrastructure on the day)
 - A modern web browser (Chrome, Edge, or Firefox recommended)
-- **Snowflake Public Data (Free)** Marketplace listing (installed in step 1b below)
+- **Snowflake Public Data (Free)** Marketplace listing (installed during Day 1)
 - No local software installation required -- everything runs inside Snowsight
+
+## Lab Structure
+
+The lab is split across two sessions, each approximately 1.5 hours:
+
+| Session | Environment | Notebook | Focus |
+|---------|-------------|----------|-------|
+| **Day 1** | Snowflake Workspaces | `DWS_SnowCamp_Day1.ipynb` | Data engineering: setup, synthetic data, Marketplace, dbt transformation & orchestration |
+| **Day 2** | Snowflake Notebook (Legacy) | `DWS_SnowCamp_Day2.ipynb` | Data products: Streamlit dashboard, Horizon Catalog, platform admin, Cortex Code |
 
 ## Quick Start
 
@@ -17,7 +26,7 @@ A 1.5-hour hands-on lab for the DWS SnowCamp training event. Attendees build a c
 
 Use the credentials provided at registration.
 
-### 1b. Install Snowflake Public Data (Free) from Marketplace
+### 2. Install Snowflake Public Data (Free) from Marketplace
 
 This free dataset provides real NASDAQ stock prices that the lab joins with synthetic holdings.
 
@@ -39,7 +48,7 @@ This free dataset provides real NASDAQ stock prices that the lab joins with synt
 
 5. The database `FINANCIAL__ECONOMIC_ESSENTIALS` will appear in your account with no storage cost
 
-### 2. Create a Git Repository integration
+### 3. Create a Git Repository integration
 
 Open a **SQL Worksheet** in Snowsight and run:
 
@@ -54,7 +63,6 @@ CREATE WAREHOUSE IF NOT EXISTS WH_LAB
     AUTO_RESUME    = TRUE;
 
 -- Enable cross-region inference for Cortex AI features
--- (trial accounts may not have all models available in their region)
 ALTER ACCOUNT SET CORTEX_ENABLED_CROSS_REGION = 'ANY_REGION';
 
 -- Allow Snowflake to connect to GitHub
@@ -71,7 +79,7 @@ CREATE OR REPLACE GIT REPOSITORY SNOWCAMP_LAB.RAW.SNOWCAMP_GIT_REPO
 ALTER GIT REPOSITORY SNOWCAMP_LAB.RAW.SNOWCAMP_GIT_REPO FETCH;
 ```
 
-### 3. Import the notebook
+### 4. Import the Day 1 notebook (Workspaces)
 
 1. Navigate to **Projects** > **Notebooks** in the left sidebar and click the **+** button, then select **Create from Repository**
 
@@ -93,43 +101,61 @@ ALTER GIT REPOSITORY SNOWCAMP_LAB.RAW.SNOWCAMP_GIT_REPO FETCH;
 
 ![Click notebooks folder](docs/images/05_click_notebooks.png)
 
-6. Select `DWS_SnowCamp_Lab.ipynb` and click **Select file**.
+6. Select **`DWS_SnowCamp_Day1.ipynb`** and click **Select file**.
 
 ![Select notebook file](docs/images/06_select_notebook.png)
 
 7. Back in the create dialog, set the **Query warehouse** to `WH_LAB` and confirm the role is `ACCOUNTADMIN`. Click **Create**.
 
-### 4. Run the lab
+### 5. Run Day 1
 
-Execute cells sequentially from top to bottom. Each section includes instructions, SQL/Python code, and links to Snowflake documentation.
+Execute cells sequentially from top to bottom. Each section includes explanations, SQL/Python code, and links to Snowflake documentation.
 
-## Lab Agenda (1.5 hours)
+### 6. Import the Day 2 notebook (Snowflake Notebook)
+
+On Day 2, repeat steps 4-7 above but select **`DWS_SnowCamp_Day2.ipynb`** instead. Day 2 should be run as a **Snowflake Notebook** (Projects > Notebooks) to enable inline Streamlit widgets.
+
+## Lab Agenda
+
+### Day 1 — Data Engineering in Snowflake Workspaces (~1.5 hours)
 
 | Part | Topic | Duration | What You Build |
 |------|-------|----------|----------------|
-| 1 | Environment Setup, Synthetic Data & Marketplace | 20 min | Database, schemas, warehouse, 6 raw tables, Marketplace install |
-| 2 | dbt Transformation | 30 min | Staging, intermediate, mart layers, dbt tests, project deployment, Marketplace join |
-| 3 | Streamlit Dashboard | 20 min | Interactive client-reporting app with real market data |
-| 4 | Internal Marketplace & Horizon | 5 min | Horizon tags, share, and data product listing |
-| 5 | Platform Administration | 15 min | Credit monitoring, query analysis, resource monitors |
+| 1 | Environment Setup & Synthetic Data | 20 min | Database, schemas, warehouse, 6 raw tables |
+| 2 | Snowflake Marketplace Integration | 10 min | Marketplace install, real NASDAQ prices |
+| 3 | dbt Transformation | 30 min | Staging, intermediate, mart layers, Marketplace join |
+| 4 | dbt Projects: Deploy, Test & Orchestrate | 30 min | dbt Project object, automated tests, scheduled Task |
+
+### Day 2 — Dashboards, Governance & AI (~1.5 hours)
+
+| Part | Topic | Duration | What You Build |
+|------|-------|----------|----------------|
+| 1 | Streamlit Dashboard | 25 min | Inline dashboard + standalone Streamlit app |
+| 2 | Horizon Catalog & Internal Marketplace | 10 min | Horizon tags, share, data product listing |
+| 3 | Platform Administration | 15 min | Credit monitoring, query analysis, resource monitors |
+| 4 | Cortex Code: What's Next | 10 min | AI-assisted development ideas and prompts |
 
 ## Repository Structure
 
 ```
 dws-snowcamp-lab/
 ├── README.md                              # This file
+├── _generate_notebook.py                  # Script that generates both notebooks
 ├── notebooks/
-│   └── DWS_SnowCamp_Lab.ipynb            # Main hands-on lab notebook
+│   ├── DWS_SnowCamp_Day1.ipynb           # Day 1: Setup, data, dbt (Workspaces)
+│   └── DWS_SnowCamp_Day2.ipynb           # Day 2: Streamlit, Horizon, admin (Notebook)
 ├── dbt/
-│   └── snowcamp_client_reporting/         # dbt Project (deployed in Part 2)
+│   └── snowcamp_client_reporting/         # dbt Project (deployed in Day 1 Part 4)
 │       ├── dbt_project.yml
 │       ├── profiles.yml                  # Snowflake connection targets (dev/prod)
 │       └── models/
-│           ├── staging/                   # Views: clean raw data + Marketplace market prices
+│           ├── staging/                   # Views: clean raw data + Marketplace prices
 │           ├── intermediate/              # Tables: join and enrich
-│           └── marts/                     # Tables: facts, dimensions, and Marketplace join
-└── streamlit/
-    └── client_reporting_app.py            # Streamlit app (deployed in Part 3)
+│           └── marts/                     # Tables: facts, dimensions, Marketplace join
+├── streamlit/
+│   └── client_reporting_app.py            # Streamlit app (deployed in Day 2 Part 1)
+└── docs/
+    └── images/                            # Screenshots for README and notebooks
 ```
 
 ## Data Model
@@ -137,11 +163,11 @@ dws-snowcamp-lab/
 The lab generates synthetic asset-management data across six tables:
 
 ```
-RAW.CLIENTS (30 rows)           RAW.SECURITIES (200 rows)
+RAW.CLIENTS (30 rows)           RAW.SECURITIES (50 rows)
     │                               │
     └── RAW.PORTFOLIOS (100 rows)   │
             │                       │
-            ├── RAW.HOLDINGS (5K rows) ──┘
+            ├── RAW.HOLDINGS (~5K rows) ──┘
             │       │
             │       └──> ANALYTICS.STG_HOLDINGS
             │                   │
@@ -149,7 +175,7 @@ RAW.CLIENTS (30 rows)           RAW.SECURITIES (200 rows)
             │       │
             │       └──> ANALYTICS.STG_TRANSACTIONS
             │
-            └── RAW.BENCHMARKS (1.2K rows)
+            └── RAW.BENCHMARKS (~1.2K rows)
                         │
         ┌───────────────┘
         │
@@ -164,8 +190,12 @@ RAW.CLIENTS (30 rows)           RAW.SECURITIES (200 rows)
 
 | Topic | Link |
 |-------|------|
+| Snowflake Workspaces | https://docs.snowflake.com/en/user-guide/ui-snowsight/workspaces |
 | Snowflake Notebooks | https://docs.snowflake.com/en/user-guide/ui-snowsight/notebooks |
 | dbt Projects on Snowflake | https://docs.snowflake.com/en/user-guide/ui-snowsight/dbt |
+| CREATE DBT PROJECT | https://docs.snowflake.com/en/sql-reference/sql/create-dbt-project |
+| EXECUTE DBT PROJECT | https://docs.snowflake.com/en/sql-reference/sql/execute-dbt-project |
+| Deploy dbt Projects | https://docs.snowflake.com/en/user-guide/data-engineering/dbt-projects-on-snowflake-deploy |
 | Streamlit in Snowflake | https://docs.snowflake.com/en/developer-guide/streamlit/about-streamlit |
 | Snowpark Python | https://docs.snowflake.com/en/developer-guide/snowpark/python/index |
 | Horizon Catalog | https://docs.snowflake.com/en/user-guide/governance-horizon |
@@ -174,24 +204,22 @@ RAW.CLIENTS (30 rows)           RAW.SECURITIES (200 rows)
 | ACCOUNT_USAGE Views | https://docs.snowflake.com/en/sql-reference/account-usage |
 | Resource Monitors | https://docs.snowflake.com/en/user-guide/resource-monitors |
 | Git Repository Integration | https://docs.snowflake.com/en/developer-guide/git/git-setting-up |
-| CREATE DBT PROJECT | https://docs.snowflake.com/en/sql-reference/sql/create-dbt-project |
-| EXECUTE DBT PROJECT | https://docs.snowflake.com/en/sql-reference/sql/execute-dbt-project |
-| Deploy dbt Projects | https://docs.snowflake.com/en/user-guide/data-engineering/dbt-projects-on-snowflake-deploy |
 | Snowflake Public Data (Free) | https://app.snowflake.com/marketplace/listing/GZTSZAS2KCS |
+| Cortex Code | https://docs.snowflake.com/en/user-guide/cortex-code/cortex-code-snowsight |
+| Introduction to Tasks | https://docs.snowflake.com/en/user-guide/tasks-intro |
 | OpenFlow (reference only) | https://docs.snowflake.com/en/user-guide/data-load-openflow |
 
 ## Context: DWS SnowCamp
 
 This lab is part of the DWS SnowCamp 2-day training event. The narrative across both days covers:
 
-1. **Discover & govern** data products with Horizon Catalog / Internal Marketplace
-2. **Ingest** data using OpenFlow (presentation only -- not in this hands-on lab)
-3. **Transform** data using dbt Projects on Snowflake
-4. **Present** data through Streamlit and Tableau
-5. **Govern and secure** the platform with monitoring and administration
-6. **Accelerate** development with Cortex Code
-
-This hands-on lab covers items 1, 3, 4, and 5 in a single interactive notebook.
+1. **Ingest** data using synthetic generation (OpenFlow covered in presentation only)
+2. **Transform** data using dbt Projects on Snowflake with automated testing
+3. **Orchestrate** pipelines with Snowflake Tasks
+4. **Present** data through Streamlit dashboards
+5. **Discover & govern** data products with Horizon Catalog / Internal Marketplace
+6. **Monitor** the platform with credit usage, query insights, and resource monitors
+7. **Accelerate** development with Cortex Code
 
 ## License
 
