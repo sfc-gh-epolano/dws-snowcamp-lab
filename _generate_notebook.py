@@ -151,7 +151,7 @@ cells.append(sql_cell("sql_validate_cybersyn", """\
 -- Validate that the Cybersyn data is accessible
 -- You should see stock price records with tickers, dates, and prices
 SELECT primary_ticker, variable_name, date, value
-FROM FINANCIAL__ECONOMIC_ESSENTIALS.CYBERSYN.STOCK_PRICE_TIMESERIES
+FROM FINANCIAL__ECONOMIC_ESSENTIALS.PUBLIC_DATA_FREE.STOCK_PRICE_TIMESERIES
 WHERE primary_ticker = 'AAPL'
   AND variable_name = 'Post-Market Close'
 ORDER BY date DESC
@@ -436,7 +436,7 @@ SELECT
     primary_ticker AS ticker,
     date           AS price_date,
     value          AS close_price
-FROM FINANCIAL__ECONOMIC_ESSENTIALS.CYBERSYN.STOCK_PRICE_TIMESERIES
+FROM FINANCIAL__ECONOMIC_ESSENTIALS.PUBLIC_DATA_FREE.STOCK_PRICE_TIMESERIES
 WHERE variable_name = 'Post-Market Close'
   AND value IS NOT NULL;
 

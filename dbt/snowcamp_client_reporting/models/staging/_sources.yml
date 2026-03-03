@@ -21,7 +21,7 @@ sources:
 
   - name: cybersyn
     database: FINANCIAL__ECONOMIC_ESSENTIALS
-    schema: CYBERSYN
+    schema: PUBLIC_DATA_FREE
     description: "Cybersyn Financial & Economic Essentials (Snowflake Marketplace - free)"
     tables:
       - name: stock_price_timeseries
