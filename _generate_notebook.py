@@ -442,8 +442,11 @@ CREATE OR REPLACE VIEW STG_SECURITIES AS
 SELECT security_id, ticker, isin, security_name, sector, asset_class, currency
 FROM SNOWCAMP_LAB.RAW.SECURITIES;
 
+SELECT 'Core staging views created!' AS status;"""))
+
+cells.append(sql_cell("sql_staging_marketplace", """\
 -- Staging: Marketplace closing prices (Snowflake Public Data)
-CREATE OR REPLACE VIEW STG_MARKET_PRICES AS
+CREATE OR REPLACE VIEW SNOWCAMP_LAB.ANALYTICS.STG_MARKET_PRICES AS
 SELECT
     primary_ticker AS ticker,
     date           AS price_date,
@@ -452,7 +455,12 @@ FROM FINANCIAL__ECONOMIC_ESSENTIALS.PUBLIC_DATA_FREE.STOCK_PRICE_TIMESERIES
 WHERE variable_name = 'Post-Market Close'
   AND value IS NOT NULL;
 
-SELECT 'Staging views created (including Marketplace prices)!' AS status;"""))
+-- Verify: show a sample of closing prices
+SELECT ticker, price_date, close_price
+FROM SNOWCAMP_LAB.ANALYTICS.STG_MARKET_PRICES
+WHERE ticker IN ('AAPL', 'MSFT', 'NVDA')
+ORDER BY ticker, price_date DESC
+LIMIT 10;"""))
 
 cells.append(md_cell("md_intermediate", """\
 ### 2b. Intermediate Layer (Tables)
@@ -570,8 +578,9 @@ SELECT
          ELSE 0 END AS valuation_diff_pct
 FROM SNOWCAMP_LAB.MARTS.F_POSITIONS_DAILY p
 LEFT JOIN SNOWCAMP_LAB.ANALYTICS.STG_MARKET_PRICES mkt
-    ON p.ticker = mkt.ticker AND p.as_of_date = mkt.price_date;
+    ON p.ticker = mkt.ticker AND p.as_of_date = mkt.price_date;"""))
 
+cells.append(sql_cell("sql_marketplace_query", """\
 -- See the real vs synthetic prices side by side
 SELECT ticker, security_name, as_of_date,
        quantity, synthetic_market_value, market_close_price,
