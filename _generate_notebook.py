@@ -1156,7 +1156,7 @@ holdings = session.sql('''
     WHERE f.as_of_date = (SELECT MAX(as_of_date) FROM SNOWCAMP_LAB.MARTS.F_POSITIONS_DAILY)
     ORDER BY f.market_value DESC LIMIT 50
 ''').to_pandas()
-st.dataframe(holdings, width="stretch")"""))
+st.dataframe(holdings, use_container_width=True)"""))
 
 day2.append(md_cell("d2_md_streamlit_deploy", """\
 ### 1b. Deploy as a Standalone Streamlit App
