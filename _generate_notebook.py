@@ -762,96 +762,117 @@ cells.append(md_cell("md_part3", """\
 ## Part 3: Streamlit Dashboard (20 min)
 
 Now let\u2019s turn the mart tables into an **interactive client-reporting dashboard** \
-using **Streamlit in Snowflake**. The dashboard includes a section showing \
-**real market prices** from the Snowflake Marketplace join.
+using **Streamlit in Snowflake**.
+
+Streamlit apps run as **standalone applications** deployed from a Git repository \u2014 \
+they are not embedded inside notebook cells. In this section we will:
+
+1. **Preview** the dashboard data here in the notebook using Snowpark + pandas
+2. **Deploy** the Streamlit app from the lab\u2019s Git repository
 
 > **Reference**: \
 [Streamlit in Snowflake](https://docs.snowflake.com/en/developer-guide/streamlit/about-streamlit) | \
-[Streamlit API Reference](https://docs.streamlit.io/develop/api-reference)"""))
+[CREATE STREAMLIT](https://docs.snowflake.com/en/sql-reference/sql/create-streamlit)"""))
 
-cells.append(py_cell("py_streamlit", """\
-import streamlit as st
+cells.append(md_cell("md_dashboard_preview", """\
+### 3a. Dashboard Data Preview
+
+Let\u2019s query the mart tables to preview what the Streamlit dashboard will show. \
+We use **Snowpark** and **pandas** to visualise results directly in the notebook."""))
+
+cells.append(py_cell("py_dashboard_preview", """\
+import matplotlib.pyplot as plt
 from snowflake.snowpark.context import get_active_session
 
 session = get_active_session()
 
-st.title("DWS Client Reporting Dashboard")
-st.caption("Built with Streamlit in Snowflake | SnowCamp Hands-On Lab")
-
-# ---- Sidebar Filters ----
-st.sidebar.header("Filters")
-regions = session.sql(
-    "SELECT DISTINCT region FROM SNOWCAMP_LAB.MARTS.D_CLIENT ORDER BY 1"
-).to_pandas()["REGION"].tolist()
-selected_region = st.sidebar.multiselect("Region", regions, default=regions)
-
-asset_classes = session.sql(
-    "SELECT DISTINCT asset_class FROM SNOWCAMP_LAB.MARTS.F_POSITIONS_DAILY ORDER BY 1"
-).to_pandas()["ASSET_CLASS"].tolist()
-selected_ac = st.sidebar.multiselect("Asset Class", asset_classes, default=asset_classes)
-
-region_filter = ", ".join([f"'{r}'" for r in selected_region]) if selected_region else "''"
-ac_filter = ", ".join([f"'{a}'" for a in selected_ac]) if selected_ac else "''"
-
-# ---- KPI Metrics ----
-kpi = session.sql(f'''
+# ---- KPI Summary ----
+kpi = session.sql('''
     SELECT COUNT(DISTINCT f.client_id) AS clients,
            COUNT(DISTINCT f.portfolio_id) AS portfolios,
            ROUND(SUM(f.market_value), 0) AS aum
     FROM SNOWCAMP_LAB.MARTS.F_POSITIONS_DAILY f
-    JOIN SNOWCAMP_LAB.MARTS.D_CLIENT c ON f.client_id = c.client_id
-    WHERE c.region IN ({region_filter}) AND f.asset_class IN ({ac_filter})
-      AND f.as_of_date = (SELECT MAX(as_of_date) FROM SNOWCAMP_LAB.MARTS.F_POSITIONS_DAILY)
+    WHERE f.as_of_date = (SELECT MAX(as_of_date) FROM SNOWCAMP_LAB.MARTS.F_POSITIONS_DAILY)
 ''').to_pandas()
-c1, c2, c3 = st.columns(3)
-c1.metric("Clients", f"{kpi['CLIENTS'].iloc[0]:,}")
-c2.metric("Portfolios", f"{kpi['PORTFOLIOS'].iloc[0]:,}")
-c3.metric("Total AUM", f"${kpi['AUM'].iloc[0]:,.0f}")
+print(f"Clients: {kpi['CLIENTS'].iloc[0]:,}")
+print(f"Portfolios: {kpi['PORTFOLIOS'].iloc[0]:,}")
+print(f"Total AUM: ${kpi['AUM'].iloc[0]:,.0f}")
 
 # ---- AUM by Region ----
-st.subheader("AUM by Region")
-aum_region = session.sql(f'''
+aum_region = session.sql('''
     SELECT c.region, ROUND(SUM(f.market_value), 0) AS aum
     FROM SNOWCAMP_LAB.MARTS.F_POSITIONS_DAILY f
     JOIN SNOWCAMP_LAB.MARTS.D_CLIENT c ON f.client_id = c.client_id
-    WHERE c.region IN ({region_filter}) AND f.asset_class IN ({ac_filter})
-      AND f.as_of_date = (SELECT MAX(as_of_date) FROM SNOWCAMP_LAB.MARTS.F_POSITIONS_DAILY)
+    WHERE f.as_of_date = (SELECT MAX(as_of_date) FROM SNOWCAMP_LAB.MARTS.F_POSITIONS_DAILY)
     GROUP BY c.region ORDER BY aum DESC
 ''').to_pandas()
-st.bar_chart(aum_region.set_index("REGION"))
 
-# ---- Mark-to-Market: Real Prices from Snowflake Marketplace ----
-st.subheader("Mark-to-Market: Real vs Synthetic (Snowflake Marketplace)")
-mtm = session.sql(f'''
-    SELECT ticker, security_name,
-           SUM(quantity) AS total_qty,
-           ROUND(SUM(synthetic_market_value), 0) AS synthetic_val,
-           ROUND(SUM(mark_to_market_value), 0) AS market_val
-    FROM SNOWCAMP_LAB.MARTS.F_HOLDINGS_WITH_MARKET_DATA m
-    JOIN SNOWCAMP_LAB.MARTS.D_CLIENT c ON m.client_id = c.client_id
-    WHERE c.region IN ({region_filter}) AND m.asset_class IN ({ac_filter})
-      AND m.as_of_date = (SELECT MAX(as_of_date) FROM SNOWCAMP_LAB.MARTS.F_HOLDINGS_WITH_MARKET_DATA)
-      AND market_close_price IS NOT NULL
-    GROUP BY ticker, security_name ORDER BY market_val DESC LIMIT 15
+fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+axes[0].barh(aum_region['REGION'], aum_region['AUM'] / 1e6, color='#29B5E8')
+axes[0].set_xlabel('AUM ($ millions)')
+axes[0].set_title('AUM by Region')
+
+# ---- AUM by Asset Class ----
+aum_ac = session.sql('''
+    SELECT asset_class, ROUND(SUM(market_value), 0) AS aum
+    FROM SNOWCAMP_LAB.MARTS.F_POSITIONS_DAILY
+    WHERE as_of_date = (SELECT MAX(as_of_date) FROM SNOWCAMP_LAB.MARTS.F_POSITIONS_DAILY)
+    GROUP BY asset_class ORDER BY aum DESC
 ''').to_pandas()
-if not mtm.empty:
-    st.bar_chart(mtm.set_index("TICKER")[["SYNTHETIC_VAL", "MARKET_VAL"]])
-    st.dataframe(mtm, use_container_width=True)
+axes[1].barh(aum_ac['ASSET_CLASS'], aum_ac['AUM'] / 1e6, color='#71D8F7')
+axes[1].set_xlabel('AUM ($ millions)')
+axes[1].set_title('AUM by Asset Class')
 
-# ---- Holdings Detail ----
-st.subheader("Top Holdings")
-holdings = session.sql(f'''
+plt.tight_layout()
+plt.show()"""))
+
+cells.append(py_cell("py_mtm_preview", """\
+import matplotlib.pyplot as plt
+from snowflake.snowpark.context import get_active_session
+
+session = get_active_session()
+
+# ---- Mark-to-Market: Real vs Synthetic ----
+mtm = session.sql('''
+    SELECT ticker, security_name,
+           ROUND(SUM(synthetic_market_value), 0) AS synthetic_val,
+           ROUND(SUM(mark_to_market_value), 0)   AS market_val
+    FROM SNOWCAMP_LAB.MARTS.F_HOLDINGS_WITH_MARKET_DATA
+    WHERE market_close_price IS NOT NULL
+      AND as_of_date = (SELECT MAX(as_of_date) FROM SNOWCAMP_LAB.MARTS.F_HOLDINGS_WITH_MARKET_DATA)
+    GROUP BY ticker, security_name
+    ORDER BY market_val DESC
+    LIMIT 12
+''').to_pandas()
+
+if not mtm.empty:
+    fig, ax = plt.subplots(figsize=(12, 6))
+    x = range(len(mtm))
+    width = 0.35
+    ax.bar([i - width/2 for i in x], mtm['SYNTHETIC_VAL'] / 1e6, width, label='Synthetic', color='#29B5E8')
+    ax.bar([i + width/2 for i in x], mtm['MARKET_VAL'] / 1e6, width, label='Market (Real)', color='#FF6F61')
+    ax.set_xticks(list(x))
+    ax.set_xticklabels(mtm['TICKER'], rotation=45, ha='right')
+    ax.set_ylabel('Value ($ millions)')
+    ax.set_title('Mark-to-Market: Synthetic vs Real NASDAQ Prices')
+    ax.legend()
+    plt.tight_layout()
+    plt.show()
+else:
+    print("No market data available -- ensure F_HOLDINGS_WITH_MARKET_DATA was created successfully.")
+
+# ---- Top Holdings ----
+holdings = session.sql('''
     SELECT f.portfolio_name, c.client_name, f.ticker, f.security_name,
            f.sector, f.asset_class, f.quantity,
            ROUND(f.market_value, 2) AS market_value,
            ROUND(f.portfolio_weight * 100, 2) AS weight_pct
     FROM SNOWCAMP_LAB.MARTS.F_POSITIONS_DAILY f
     JOIN SNOWCAMP_LAB.MARTS.D_CLIENT c ON f.client_id = c.client_id
-    WHERE c.region IN ({region_filter}) AND f.asset_class IN ({ac_filter})
-      AND f.as_of_date = (SELECT MAX(as_of_date) FROM SNOWCAMP_LAB.MARTS.F_POSITIONS_DAILY)
-    ORDER BY f.market_value DESC LIMIT 100
+    WHERE f.as_of_date = (SELECT MAX(as_of_date) FROM SNOWCAMP_LAB.MARTS.F_POSITIONS_DAILY)
+    ORDER BY f.market_value DESC LIMIT 20
 ''').to_pandas()
-st.dataframe(holdings, use_container_width=True)"""))
+holdings"""))
 
 cells.append(md_cell("md_streamlit_deploy", """\
 ### Deploying as a Standalone Streamlit App
@@ -1043,6 +1064,51 @@ You have built an **end-to-end client-reporting data product** on Snowflake:
 | Cortex Code | [docs.snowflake.com/...cortex-code](https://docs.snowflake.com/en/user-guide/ui-snowsight/cortex-code) |
 
 > *Thank you for attending DWS SnowCamp!*"""))
+
+# =========================================================================
+# TEARDOWN (commented out)
+# =========================================================================
+
+cells.append(md_cell("md_teardown", """\
+---
+## Teardown (Optional)
+
+Run the cells below **only** when you want to remove all lab objects from your account. \
+All statements are commented out to prevent accidental execution. \
+Uncomment and run when you are ready to clean up."""))
+
+cells.append(sql_cell("sql_teardown", """\
+-- =====================================================
+-- UNCOMMENT THE LINES BELOW TO TEAR DOWN THE LAB
+-- =====================================================
+
+-- Drop the Streamlit app
+-- DROP STREAMLIT IF EXISTS SNOWCAMP_LAB.ANALYTICS.CLIENT_REPORTING_APP;
+
+-- Drop the dbt project
+-- DROP DBT PROJECT IF EXISTS SNOWCAMP_LAB.ANALYTICS.SNOWCAMP_CLIENT_REPORTING;
+
+-- Drop the share
+-- DROP SHARE IF EXISTS SNOWCAMP_CLIENT_REPORTING_SHARE;
+
+-- Drop the resource monitor
+-- ALTER WAREHOUSE WH_LAB UNSET RESOURCE_MONITOR;
+-- DROP RESOURCE MONITOR IF EXISTS LAB_MONITOR;
+
+-- Drop the Git repository and API integration
+-- DROP GIT REPOSITORY IF EXISTS SNOWCAMP_LAB.RAW.SNOWCAMP_GIT_REPO;
+-- DROP API INTEGRATION IF EXISTS snowcamp_git_api;
+
+-- Drop the lab database (removes ALL schemas, tables, views)
+-- DROP DATABASE IF EXISTS SNOWCAMP_LAB;
+
+-- Drop the warehouse
+-- DROP WAREHOUSE IF EXISTS WH_LAB;
+
+-- Drop the Marketplace database (if you no longer need it)
+-- DROP DATABASE IF EXISTS FINANCIAL__ECONOMIC_ESSENTIALS;
+
+SELECT 'Teardown complete -- all lab objects removed.' AS status;"""))
 
 # =========================================================================
 # ASSEMBLE NOTEBOOK
