@@ -1,0 +1,42 @@
+version: 2
+
+models:
+  - name: stg_holdings
+    description: "Cleaned holdings with derived unit price"
+    columns:
+      - name: holding_id
+        tests: [not_null, unique]
+      - name: portfolio_id
+        tests: [not_null]
+      - name: security_id
+        tests: [not_null]
+      - name: market_value
+        tests: [not_null]
+
+  - name: stg_securities
+    description: "Cleaned securities master with NASDAQ ticker"
+    columns:
+      - name: security_id
+        tests: [not_null, unique]
+      - name: ticker
+        tests: [not_null]
+
+  - name: stg_transactions
+    description: "Cleaned trade executions with signed quantity"
+    columns:
+      - name: transaction_id
+        tests: [not_null, unique]
+      - name: portfolio_id
+        tests: [not_null]
+      - name: price
+        tests: [not_null]
+
+  - name: stg_market_prices
+    description: "NASDAQ closing prices from Cybersyn Marketplace data"
+    columns:
+      - name: ticker
+        tests: [not_null]
+      - name: price_date
+        tests: [not_null]
+      - name: close_price
+        tests: [not_null]

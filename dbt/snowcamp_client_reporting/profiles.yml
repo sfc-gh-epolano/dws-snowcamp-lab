@@ -1,0 +1,19 @@
+snowcamp:
+  target: dev
+  outputs:
+    dev:
+      type: snowflake
+      account: 'not needed'
+      user: 'not needed'
+      role: accountadmin
+      database: SNOWCAMP_LAB
+      schema: ANALYTICS
+      warehouse: WH_LAB
+    prod:
+      type: snowflake
+      account: 'not needed'
+      user: 'not needed'
+      role: accountadmin
+      database: SNOWCAMP_LAB
+      schema: MARTS
+      warehouse: WH_LAB

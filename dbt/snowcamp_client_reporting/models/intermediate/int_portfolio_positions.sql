@@ -24,6 +24,7 @@ joined as (
         h.quantity,
         h.market_value,
         h.unit_price,
+        s.ticker,
         s.isin,
         s.security_name,
         s.sector,

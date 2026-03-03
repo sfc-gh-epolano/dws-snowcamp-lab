@@ -1,0 +1,48 @@
+version: 2
+
+models:
+  - name: f_positions_daily
+    description: "Daily portfolio positions with full security and client context"
+    columns:
+      - name: holding_id
+        tests: [not_null, unique]
+      - name: portfolio_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('d_portfolio')
+              field: portfolio_id
+      - name: client_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('d_client')
+              field: client_id
+
+  - name: f_performance_daily
+    description: "Daily portfolio returns vs benchmark with active return"
+    columns:
+      - name: portfolio_id
+        tests: [not_null]
+      - name: as_of_date
+        tests: [not_null]
+
+  - name: f_holdings_with_market_data
+    description: "Holdings enriched with real NASDAQ closing prices from Cybersyn Marketplace"
+    columns:
+      - name: holding_id
+        tests: [not_null]
+      - name: ticker
+        tests: [not_null]
+
+  - name: d_portfolio
+    description: "Portfolio dimension with client attributes"
+    columns:
+      - name: portfolio_id
+        tests: [not_null, unique]
+
+  - name: d_client
+    description: "Client dimension"
+    columns:
+      - name: client_id
+        tests: [not_null, unique]

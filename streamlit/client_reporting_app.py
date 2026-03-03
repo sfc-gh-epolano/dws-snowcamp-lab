@@ -99,6 +99,38 @@ if not perf_df.empty:
     st.line_chart(chart_data)
 
 # ---------------------------------------------------------------------------
+# Mark-to-Market: Real prices from Cybersyn Marketplace
+# ---------------------------------------------------------------------------
+st.subheader("Mark-to-Market: Real vs Synthetic Prices (Cybersyn Marketplace)")
+st.caption("Synthetic holdings enriched with real NASDAQ closing prices via Snowflake Marketplace")
+
+mtm_df = session.sql(f"""
+    SELECT
+        m.ticker,
+        m.security_name,
+        m.sector,
+        SUM(m.quantity)                       AS total_qty,
+        ROUND(SUM(m.synthetic_market_value), 0) AS synthetic_value,
+        ROUND(SUM(m.mark_to_market_value), 0)   AS market_value,
+        ROUND(AVG(m.valuation_diff_pct) * 100, 2) AS avg_diff_pct
+    FROM SNOWCAMP_LAB.MARTS.F_HOLDINGS_WITH_MARKET_DATA m
+    JOIN SNOWCAMP_LAB.MARTS.D_CLIENT c ON m.client_id = c.client_id
+    WHERE c.region IN ({region_filter})
+      AND m.asset_class IN ({ac_filter})
+      AND m.as_of_date = (SELECT MAX(as_of_date) FROM SNOWCAMP_LAB.MARTS.F_HOLDINGS_WITH_MARKET_DATA)
+      AND m.market_close_price IS NOT NULL
+    GROUP BY m.ticker, m.security_name, m.sector
+    ORDER BY market_value DESC
+    LIMIT 20
+""").to_pandas()
+
+if not mtm_df.empty:
+    st.bar_chart(mtm_df.set_index("TICKER")[["SYNTHETIC_VALUE", "MARKET_VALUE"]])
+    st.dataframe(mtm_df, use_container_width=True)
+else:
+    st.info("Mark-to-market data requires the Cybersyn Financial & Economic Essentials Marketplace listing.")
+
+# ---------------------------------------------------------------------------
 # Holdings detail
 # ---------------------------------------------------------------------------
 st.subheader("Holdings Detail")

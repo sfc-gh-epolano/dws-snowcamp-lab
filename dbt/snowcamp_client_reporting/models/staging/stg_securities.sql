@@ -5,6 +5,7 @@ with source as (
 cleaned as (
     select
         security_id,
+        ticker,
         isin,
         security_name,
         sector,

@@ -20,6 +20,7 @@ select
     po.portfolio_type,
     po.benchmark_id,
     p.security_id,
+    p.ticker,
     p.isin,
     p.security_name,
     p.sector,

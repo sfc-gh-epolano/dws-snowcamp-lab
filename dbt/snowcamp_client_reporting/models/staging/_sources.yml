@@ -18,3 +18,11 @@ sources:
         description: "Trade executions (buys and sells)"
       - name: benchmarks
         description: "Daily benchmark index returns"
+
+  - name: cybersyn
+    database: FINANCIAL__ECONOMIC_ESSENTIALS
+    schema: CYBERSYN
+    description: "Cybersyn Financial & Economic Essentials (Snowflake Marketplace - free)"
+    tables:
+      - name: stock_price_timeseries
+        description: "NASDAQ stock prices (open, close, high, low, volume) for all US equities and ETFs"
