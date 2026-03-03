@@ -3,6 +3,8 @@
 import json
 import os
 
+IMG = "https://raw.githubusercontent.com/sfc-gh-epolano/dws-snowcamp-lab/main/docs/images"
+
 def split_source(text):
     lines = text.split('\n')
     result = []
@@ -132,27 +134,27 @@ USE SCHEMA RAW;
 
 SELECT 'Environment ready!' AS status;"""))
 
-cells.append(md_cell("md_marketplace_install", """\
+cells.append(md_cell("md_marketplace_install", f"""\
 ### Install Snowflake Public Data (Free) from Marketplace
 
 Before generating data, let\u2019s install a **free Marketplace listing** that provides \
 real NASDAQ stock prices. We will join this with our synthetic holdings later.
 
-1. In Snowsight, navigate to **Data Products** \u2192 **Marketplace**
+1. In Snowsight, navigate to **Data Products** \u2192 **Marketplace** and search for **Snowflake Public Data (Free)**
 
-![Navigate to Marketplace](docs/images/07_marketplace_search.png)
+![Search Marketplace]({IMG}/07_marketplace_search.png)
 
-2. Search for **Snowflake Public Data** and click on the **Snowflake Public Data (Free)** listing
+2. Click on the **Snowflake Public Data (Free)** listing from **Snowflake Public Data Products**
 
-![Snowflake Public Data listing](docs/images/08_snowflake_public_data_listing.png)
+![Snowflake Public Data listing]({IMG}/08_snowflake_public_data_listing.png)
 
 3. Click **Get** to open the install dialog
 
-![Get listing](docs/images/09_get_listing.png)
+![Get listing]({IMG}/09_get_listing.png)
 
 4. Expand **Options**, confirm the database name is `FINANCIAL__ECONOMIC_ESSENTIALS`, then click **Get**
 
-![Get listing with options](docs/images/10_get_listing_options.png)
+![Get listing with options]({IMG}/10_get_listing_options.png)
 
 5. The database will appear in your account with **no storage cost** (zero-copy data sharing)
 
@@ -764,21 +766,37 @@ cells.append(md_cell("md_part3", """\
 Now let\u2019s turn the mart tables into an **interactive client-reporting dashboard** \
 using **Streamlit in Snowflake**.
 
-Streamlit apps run as **standalone applications** deployed from a Git repository \u2014 \
-they are not embedded inside notebook cells. In this section we will:
+In this section we will:
 
-1. **Preview** the dashboard data here in the notebook using Snowpark + pandas
-2. **Deploy** the Streamlit app from the lab\u2019s Git repository
+1. **Install Streamlit** in the notebook runtime and restart the kernel
+2. **Preview** the dashboard inline and with charts
+3. **Deploy** a standalone Streamlit app from the Git repository
 
 > **Reference**: \
 [Streamlit in Snowflake](https://docs.snowflake.com/en/developer-guide/streamlit/about-streamlit) | \
 [CREATE STREAMLIT](https://docs.snowflake.com/en/sql-reference/sql/create-streamlit)"""))
 
-cells.append(md_cell("md_dashboard_preview", """\
-### 3a. Dashboard Data Preview
+cells.append(md_cell("md_install_streamlit", """\
+### 3a. Install Streamlit
 
-Let\u2019s query the mart tables to preview what the Streamlit dashboard will show. \
-We use **Snowpark** and **pandas** to visualise results directly in the notebook."""))
+Snowflake Notebooks in Workspaces use a Jupyter-based runtime. To use Streamlit \
+widgets inline, first install the `streamlit` package, then **restart the kernel** \
+to pick up the new package.
+
+> After running the cell below, click the **Connected** dropdown at the top of the \
+notebook and select **Restart kernel** (see screenshot below). Your installed packages \
+will be preserved.
+
+![Restart kernel]({img}/11_restart_kernel.png)""".format(img=IMG)))
+
+cells.append(py_cell("py_install_streamlit", """\
+!pip install streamlit"""))
+
+cells.append(md_cell("md_dashboard_preview", """\
+### 3b. Dashboard Data Preview
+
+Let\u2019s query the mart tables to preview the data with charts. Run the cells \
+below after restarting the kernel."""))
 
 cells.append(py_cell("py_dashboard_preview", """\
 import matplotlib.pyplot as plt
@@ -874,10 +892,80 @@ holdings = session.sql('''
 ''').to_pandas()
 holdings"""))
 
-cells.append(md_cell("md_streamlit_deploy", """\
-### Deploying as a Standalone Streamlit App
+cells.append(md_cell("md_streamlit_inline", """\
+### 3c. Streamlit Inline Preview
 
-The lab\u2019s GitHub repo includes a ready-to-deploy app at `streamlit/client_reporting_app.py`.
+Now that Streamlit is installed, you can render interactive widgets directly \
+in the notebook. The cell below builds a mini client-reporting dashboard \
+with KPIs, charts, and a data table."""))
+
+cells.append(py_cell("py_streamlit", """\
+import streamlit as st
+from snowflake.snowpark.context import get_active_session
+
+session = get_active_session()
+
+st.title("DWS Client Reporting Dashboard")
+st.caption("Built with Streamlit in Snowflake | SnowCamp Hands-On Lab")
+
+# ---- KPI Metrics ----
+kpi = session.sql('''
+    SELECT COUNT(DISTINCT f.client_id) AS clients,
+           COUNT(DISTINCT f.portfolio_id) AS portfolios,
+           ROUND(SUM(f.market_value), 0) AS aum
+    FROM SNOWCAMP_LAB.MARTS.F_POSITIONS_DAILY f
+    WHERE f.as_of_date = (SELECT MAX(as_of_date) FROM SNOWCAMP_LAB.MARTS.F_POSITIONS_DAILY)
+''').to_pandas()
+c1, c2, c3 = st.columns(3)
+c1.metric("Clients", f"{kpi['CLIENTS'].iloc[0]:,}")
+c2.metric("Portfolios", f"{kpi['PORTFOLIOS'].iloc[0]:,}")
+c3.metric("Total AUM", f"${kpi['AUM'].iloc[0]:,.0f}")
+
+# ---- AUM by Region ----
+st.subheader("AUM by Region")
+aum_region = session.sql('''
+    SELECT c.region, ROUND(SUM(f.market_value), 0) AS aum
+    FROM SNOWCAMP_LAB.MARTS.F_POSITIONS_DAILY f
+    JOIN SNOWCAMP_LAB.MARTS.D_CLIENT c ON f.client_id = c.client_id
+    WHERE f.as_of_date = (SELECT MAX(as_of_date) FROM SNOWCAMP_LAB.MARTS.F_POSITIONS_DAILY)
+    GROUP BY c.region ORDER BY aum DESC
+''').to_pandas()
+st.bar_chart(aum_region.set_index("REGION"))
+
+# ---- Mark-to-Market: Real vs Synthetic ----
+st.subheader("Mark-to-Market: Real vs Synthetic (Snowflake Marketplace)")
+mtm = session.sql('''
+    SELECT ticker, security_name,
+           ROUND(SUM(synthetic_market_value), 0) AS synthetic_val,
+           ROUND(SUM(mark_to_market_value), 0)   AS market_val
+    FROM SNOWCAMP_LAB.MARTS.F_HOLDINGS_WITH_MARKET_DATA
+    WHERE market_close_price IS NOT NULL
+      AND as_of_date = (SELECT MAX(as_of_date) FROM SNOWCAMP_LAB.MARTS.F_HOLDINGS_WITH_MARKET_DATA)
+    GROUP BY ticker, security_name
+    ORDER BY market_val DESC LIMIT 15
+''').to_pandas()
+if not mtm.empty:
+    st.bar_chart(mtm.set_index("TICKER")[["SYNTHETIC_VAL", "MARKET_VAL"]])
+
+# ---- Top Holdings ----
+st.subheader("Top Holdings")
+holdings = session.sql('''
+    SELECT f.portfolio_name, c.client_name, f.ticker, f.security_name,
+           f.sector, f.asset_class, f.quantity,
+           ROUND(f.market_value, 2) AS market_value,
+           ROUND(f.portfolio_weight * 100, 2) AS weight_pct
+    FROM SNOWCAMP_LAB.MARTS.F_POSITIONS_DAILY f
+    JOIN SNOWCAMP_LAB.MARTS.D_CLIENT c ON f.client_id = c.client_id
+    WHERE f.as_of_date = (SELECT MAX(as_of_date) FROM SNOWCAMP_LAB.MARTS.F_POSITIONS_DAILY)
+    ORDER BY f.market_value DESC LIMIT 50
+''').to_pandas()
+st.dataframe(holdings, use_container_width=True)"""))
+
+cells.append(md_cell("md_streamlit_deploy", """\
+### 3d. Deploying as a Standalone Streamlit App
+
+The lab\u2019s GitHub repo includes a ready-to-deploy app at `streamlit/client_reporting_app.py` \
+with filters, the mark-to-market chart, and more.
 
 > **Reference**: \
 [CREATE STREAMLIT](https://docs.snowflake.com/en/sql-reference/sql/create-streamlit) | \
