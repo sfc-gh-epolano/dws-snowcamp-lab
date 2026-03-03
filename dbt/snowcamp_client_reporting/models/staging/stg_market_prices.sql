@@ -4,11 +4,11 @@ with source as (
 
 closing_prices as (
     select
-        primary_ticker as ticker,
+        ticker,
         date           as price_date,
         value          as close_price
     from source
-    where variable_name = 'Post-Market Close'
+    where variable = 'post-market_close_adjusted'
       and value is not null
 )
 

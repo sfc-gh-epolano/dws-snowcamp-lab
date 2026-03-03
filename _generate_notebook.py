@@ -159,15 +159,15 @@ real NASDAQ stock prices. We will join this with our synthetic holdings later.
 > **Reference**: \
 [Snowflake Marketplace](https://docs.snowflake.com/en/user-guide/data-marketplace)"""))
 
-cells.append(sql_cell("sql_validate_cybersyn", """\
+cells.append(sql_cell("sql_validate_marketplace", """\
 -- Validate that the Marketplace data is accessible
 -- You should see stock price records with tickers, dates, and prices
-SELECT primary_ticker, variable_name, date, value
+SELECT *
 FROM FINANCIAL__ECONOMIC_ESSENTIALS.PUBLIC_DATA_FREE.STOCK_PRICE_TIMESERIES
-WHERE primary_ticker = 'AAPL'
-  AND variable_name = 'Post-Market Close'
+WHERE ticker = 'AAPL'
+  AND variable = 'post-market_close_adjusted'
 ORDER BY date DESC
-LIMIT 5;"""))
+LIMIT 10;"""))
 
 cells.append(md_cell("md_datamodel", """\
 ### Data Model
@@ -448,11 +448,11 @@ cells.append(sql_cell("sql_staging_marketplace", """\
 -- Staging: Marketplace closing prices (Snowflake Public Data)
 CREATE OR REPLACE VIEW SNOWCAMP_LAB.ANALYTICS.STG_MARKET_PRICES AS
 SELECT
-    primary_ticker AS ticker,
+    ticker,
     date           AS price_date,
     value          AS close_price
 FROM FINANCIAL__ECONOMIC_ESSENTIALS.PUBLIC_DATA_FREE.STOCK_PRICE_TIMESERIES
-WHERE variable_name = 'Post-Market Close'
+WHERE variable = 'post-market_close_adjusted'
   AND value IS NOT NULL;
 
 -- Verify: show a sample of closing prices
