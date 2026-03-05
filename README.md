@@ -221,6 +221,10 @@ This lab is part of the DWS SnowCamp 2-day training event. The narrative across 
 6. **Monitor** the platform with credit usage, query insights, and resource monitors
 7. **Accelerate** development with Cortex Code
 
+## Legal
+
+This application is not part of the Snowflake Service and is governed by the terms in [LICENSE](LICENSE), unless expressly agreed to in writing. You use this application at your own risk, and Snowflake has no obligation to support your use of this application.
+
 ## License
 
-Internal use -- DWS SnowCamp training material.
+Licensed under the Apache License, Version 2.0. See [LICENSE](LICENSE) for details.
