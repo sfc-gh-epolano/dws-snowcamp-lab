@@ -126,7 +126,7 @@ mtm_df = session.sql(f"""
 
 if not mtm_df.empty:
     st.bar_chart(mtm_df.set_index("TICKER")[["SYNTHETIC_VALUE", "MARKET_VALUE"]])
-    st.dataframe(mtm_df, width="stretch")
+    st.dataframe(mtm_df, use_container_width=True)
 else:
     st.info("Mark-to-market data requires the Snowflake Public Data (Free) Marketplace listing.")
 
@@ -155,4 +155,4 @@ holdings_df = session.sql(f"""
     ORDER BY f.market_value DESC
     LIMIT 200
 """).to_pandas()
-st.dataframe(holdings_df, width="stretch")
+st.dataframe(holdings_df, use_container_width=True)
