@@ -1408,11 +1408,11 @@ few minutes to explore these in the UI:
 
 | Feature | Where to Find It | What It Shows |
 |---------|-----------------|--------------|
-| **Query Insights** | Activity → Query History | Slow queries, scan efficiency, execution plans |
-| **Performance Explorer** | Admin → Warehouses → select a warehouse | Load patterns, queuing, auto-scaling decisions |
-| **Cost Management** | Admin → Cost Management | Credit usage trends, resource monitor status |
-| **Trust Center** | Admin → Security | Security posture, encryption status, network policies |
-| **Lineage** | Data → select a table → Lineage tab | Upstream/downstream data flow |
+| **Query History** | Monitoring → Query history | Slow queries, scan efficiency, execution plans |
+| **Performance Explorer** | Monitoring → Performance explorer | Load patterns, queuing, auto-scaling decisions |
+| **Cost Management** | Admin → Cost management | Credit usage trends, resource monitor status |
+| **Trust Center** | Governance & security → Trust Center | Security posture, encryption status, network policies |
+| **Tags & Policies** | Governance & security → Tags & policies | Tag-based masking policies, row access policies |
 
 > **Reference**: \
 [Query Insights](https://docs.snowflake.com/en/user-guide/ui-snowsight/activity) | \
