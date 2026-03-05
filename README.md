@@ -8,17 +8,42 @@ A two-session hands-on lab for the DWS SnowCamp training event. Attendees build 
 
 - A **Snowflake Trial account** (provided via HOL infrastructure on the day)
 - A modern web browser (Chrome, Edge, or Firefox recommended)
-- **Snowflake Public Data (Free)** Marketplace listing (installed during Day 1)
 - No local software installation required -- everything runs inside Snowsight
 
 ## Lab Structure
 
-The lab is split across two sessions, each approximately 1.5 hours:
+The lab is split across two sessions, each approximately 1.5 hours. The narrative across both days covers:
+
+1. **Ingest** data using synthetic generation (OpenFlow covered in presentation only)
+2. **Transform** data using dbt Projects on Snowflake with automated testing
+3. **Orchestrate** pipelines with Snowflake Tasks
+4. **Present** data through Streamlit dashboards
+5. **Discover & govern** data products with Horizon Catalog / Internal Marketplace
+6. **Monitor** the platform with credit usage, query insights, and resource monitors
+7. **Accelerate** development with Cortex Code
 
 | Session | Environment | Notebook | Focus |
 |---------|-------------|----------|-------|
 | **Day 1** | Snowflake Workspaces | `DWS_SnowCamp_Day1.ipynb` | Data engineering: setup, synthetic data, Marketplace, dbt transformation & orchestration |
-| **Day 2** | Snowflake Notebook (Legacy) | `DWS_SnowCamp_Day2.ipynb` | Data products: Streamlit dashboard, Horizon Catalog, platform admin, Cortex Code |
+| **Day 2** | Snowflake Notebook | `DWS_SnowCamp_Day2.ipynb` | Data products: Streamlit dashboard, Horizon Catalog, platform admin, Cortex Code |
+
+### Day 1 -- Data Engineering in Snowflake Workspaces (~1.5 hours)
+
+| Part | Topic | Duration | What You Build |
+|------|-------|----------|----------------|
+| 1 | Environment Setup & Synthetic Data | 20 min | Database, schemas, warehouse, 6 raw tables |
+| 2 | Snowflake Marketplace Integration | 10 min | Marketplace install, real NASDAQ prices |
+| 3 | dbt Transformation | 30 min | Staging, intermediate, mart layers, Marketplace join |
+| 4 | dbt Projects: Deploy, Test & Orchestrate | 30 min | dbt Project object, automated tests, scheduled Task |
+
+### Day 2 -- Dashboards, Governance & AI (~1.5 hours)
+
+| Part | Topic | Duration | What You Build |
+|------|-------|----------|----------------|
+| 1 | Streamlit Dashboard | 25 min | Inline dashboard + standalone Streamlit app |
+| 2 | Horizon Catalog & Internal Marketplace | 10 min | Horizon tags, share, data product listing |
+| 3 | Platform Administration | 15 min | Credit monitoring, query analysis, resource monitors |
+| 4 | Cortex Code: What's Next | 10 min | AI-assisted development ideas and prompts |
 
 ## Quick Start
 
@@ -26,29 +51,7 @@ The lab is split across two sessions, each approximately 1.5 hours:
 
 Use the credentials provided at registration.
 
-### 2. Install Snowflake Public Data (Free) from Marketplace
-
-This free dataset provides real NASDAQ stock prices that the lab joins with synthetic holdings.
-
-1. In Snowsight, navigate to **Data Products** > **Marketplace**
-
-![Navigate to Marketplace](docs/images/07_marketplace_search.png)
-
-2. Search for **Snowflake Public Data** and click on the **Snowflake Public Data (Free)** listing from **Snowflake Public Data Products**
-
-![Snowflake Public Data listing](docs/images/08_snowflake_public_data_listing.png)
-
-3. Click **Get** to open the install dialog
-
-![Get listing](docs/images/09_get_listing.png)
-
-4. Expand **Options** and confirm the database name is `FINANCIAL__ECONOMIC_ESSENTIALS`. Click **Get** to install.
-
-![Get listing with options](docs/images/10_get_listing_options.png)
-
-5. The database `FINANCIAL__ECONOMIC_ESSENTIALS` will appear in your account with no storage cost
-
-### 3. Create a Git Repository integration
+### 2. Create a Git Repository integration
 
 Open a **SQL Worksheet** in Snowsight and run:
 
@@ -79,7 +82,19 @@ CREATE OR REPLACE GIT REPOSITORY SNOWCAMP_LAB.RAW.SNOWCAMP_GIT_REPO
 ALTER GIT REPOSITORY SNOWCAMP_LAB.RAW.SNOWCAMP_GIT_REPO FETCH;
 ```
 
-### 4. Import the Day 1 notebook (Workspaces)
+### 3. Import the Day 1 notebook (Workspaces)
+
+> **Screenshots coming soon** -- detailed Workspaces import instructions will be added here.
+
+1. Navigate to **Projects** > **Workspaces** in the left sidebar
+2. Create a new Workspace and import `DWS_SnowCamp_Day1.ipynb` from the Git repository
+3. Set the **Query warehouse** to `WH_LAB` and confirm the role is `ACCOUNTADMIN`
+
+### 4. Run Day 1
+
+Execute cells sequentially from top to bottom. Each section includes explanations, SQL/Python code, and links to Snowflake documentation.
+
+### 5. Import the Day 2 notebook (Snowflake Notebook)
 
 1. Navigate to **Projects** > **Notebooks** in the left sidebar and click the **+** button, then select **Create from Repository**
 
@@ -101,45 +116,23 @@ ALTER GIT REPOSITORY SNOWCAMP_LAB.RAW.SNOWCAMP_GIT_REPO FETCH;
 
 ![Click notebooks folder](docs/images/05_click_notebooks.png)
 
-6. Select **`DWS_SnowCamp_Day1.ipynb`** and click **Select file**.
+6. Select **`DWS_SnowCamp_Day2.ipynb`** and click **Select file**.
 
 ![Select notebook file](docs/images/06_select_notebook.png)
 
 7. Back in the create dialog, set the **Query warehouse** to `WH_LAB` and confirm the role is `ACCOUNTADMIN`. Click **Create**.
 
-### 5. Run Day 1
+### 6. Run Day 2
 
-Execute cells sequentially from top to bottom. Each section includes explanations, SQL/Python code, and links to Snowflake documentation.
-
-### 6. Import the Day 2 notebook (Snowflake Notebook)
-
-On Day 2, repeat steps 4-7 above but select **`DWS_SnowCamp_Day2.ipynb`** instead. Day 2 should be run as a **Snowflake Notebook** (Projects > Notebooks) to enable inline Streamlit widgets.
-
-## Lab Agenda
-
-### Day 1 — Data Engineering in Snowflake Workspaces (~1.5 hours)
-
-| Part | Topic | Duration | What You Build |
-|------|-------|----------|----------------|
-| 1 | Environment Setup & Synthetic Data | 20 min | Database, schemas, warehouse, 6 raw tables |
-| 2 | Snowflake Marketplace Integration | 10 min | Marketplace install, real NASDAQ prices |
-| 3 | dbt Transformation | 30 min | Staging, intermediate, mart layers, Marketplace join |
-| 4 | dbt Projects: Deploy, Test & Orchestrate | 30 min | dbt Project object, automated tests, scheduled Task |
-
-### Day 2 — Dashboards, Governance & AI (~1.5 hours)
-
-| Part | Topic | Duration | What You Build |
-|------|-------|----------|----------------|
-| 1 | Streamlit Dashboard | 25 min | Inline dashboard + standalone Streamlit app |
-| 2 | Horizon Catalog & Internal Marketplace | 10 min | Horizon tags, share, data product listing |
-| 3 | Platform Administration | 15 min | Credit monitoring, query analysis, resource monitors |
-| 4 | Cortex Code: What's Next | 10 min | AI-assisted development ideas and prompts |
+Execute cells sequentially from top to bottom. Day 2 uses a Snowflake Notebook to enable inline Streamlit widgets.
 
 ## Repository Structure
 
 ```
 dws-snowcamp-lab/
 ├── README.md                              # This file
+├── LEGAL.md                               # Snowflake legal disclaimer
+├── LICENSE                                # Apache License 2.0
 ├── _generate_notebook.py                  # Script that generates both notebooks
 ├── notebooks/
 │   ├── DWS_SnowCamp_Day1.ipynb           # Day 1: Setup, data, dbt (Workspaces)
@@ -208,18 +201,6 @@ RAW.CLIENTS (30 rows)           RAW.SECURITIES (50 rows)
 | Cortex Code | https://docs.snowflake.com/en/user-guide/cortex-code/cortex-code-snowsight |
 | Introduction to Tasks | https://docs.snowflake.com/en/user-guide/tasks-intro |
 | OpenFlow (reference only) | https://docs.snowflake.com/en/user-guide/data-load-openflow |
-
-## Context: DWS SnowCamp
-
-This lab is part of the DWS SnowCamp 2-day training event. The narrative across both days covers:
-
-1. **Ingest** data using synthetic generation (OpenFlow covered in presentation only)
-2. **Transform** data using dbt Projects on Snowflake with automated testing
-3. **Orchestrate** pipelines with Snowflake Tasks
-4. **Present** data through Streamlit dashboards
-5. **Discover & govern** data products with Horizon Catalog / Internal Marketplace
-6. **Monitor** the platform with credit usage, query insights, and resource monitors
-7. **Accelerate** development with Cortex Code
 
 ## Legal
 
