@@ -181,6 +181,12 @@ CREATE SCHEMA IF NOT EXISTS SNOWCAMP_LAB.ANALYTICS
 CREATE SCHEMA IF NOT EXISTS SNOWCAMP_LAB.MARTS
     COMMENT = 'Gold/Mart layer - business-ready data products';
 
+CREATE SCHEMA IF NOT EXISTS SNOWCAMP_LAB.GITREPO
+    COMMENT = 'Git repository integrations';
+
+CREATE SCHEMA IF NOT EXISTS SNOWCAMP_LAB.NOTEBOOKS
+    COMMENT = 'Snowflake Notebooks';
+
 CREATE WAREHOUSE IF NOT EXISTS WH_LAB
     WAREHOUSE_SIZE   = 'MEDIUM'
     AUTO_SUSPEND     = 60
@@ -851,15 +857,15 @@ CREATE OR REPLACE API INTEGRATION snowcamp_git_api
     ENABLED            = TRUE;
 
 -- Create a Git Repository pointing to the lab repo
-CREATE OR REPLACE GIT REPOSITORY SNOWCAMP_LAB.RAW.SNOWCAMP_GIT_REPO
+CREATE OR REPLACE GIT REPOSITORY SNOWCAMP_LAB.GITREPO.SNOWCAMP_GIT_REPO
     API_INTEGRATION = snowcamp_git_api
     ORIGIN          = 'https://github.com/sfc-gh-epolano/dws-snowcamp-lab.git';
 
 -- Fetch the latest content
-ALTER GIT REPOSITORY SNOWCAMP_LAB.RAW.SNOWCAMP_GIT_REPO FETCH;
+ALTER GIT REPOSITORY SNOWCAMP_LAB.GITREPO.SNOWCAMP_GIT_REPO FETCH;
 
 -- Verify the dbt project files are accessible
-LS @SNOWCAMP_LAB.RAW.SNOWCAMP_GIT_REPO/branches/main/dbt/snowcamp_client_reporting/;"""))
+LS @SNOWCAMP_LAB.GITREPO.SNOWCAMP_GIT_REPO/branches/main/dbt/snowcamp_client_reporting/;"""))
 
 day1.append(md_cell("d1_md_dbt_deploy", """\
 ### Deploy and Execute the dbt Project
@@ -883,7 +889,7 @@ When we execute `dbt build`, Snowflake:
 day1.append(sql_cell("d1_sql_dbt_deploy", """\
 -- Deploy the dbt Project object from the Git repository
 CREATE OR REPLACE DBT PROJECT SNOWCAMP_LAB.ANALYTICS.SNOWCAMP_CLIENT_REPORTING
-    FROM @SNOWCAMP_LAB.RAW.SNOWCAMP_GIT_REPO/branches/main/dbt/snowcamp_client_reporting;
+    FROM @SNOWCAMP_LAB.GITREPO.SNOWCAMP_GIT_REPO/branches/main/dbt/snowcamp_client_reporting;
 
 -- Execute dbt build — this runs all models + tests in dependency order
 EXECUTE DBT PROJECT SNOWCAMP_LAB.ANALYTICS.SNOWCAMP_CLIENT_REPORTING
@@ -1189,14 +1195,14 @@ click the URL from `SHOW STREAMLITS`.
 
 day2.append(sql_cell("d2_sql_create_streamlit", """\
 -- Make sure we have the latest repo content
-ALTER GIT REPOSITORY SNOWCAMP_LAB.RAW.SNOWCAMP_GIT_REPO FETCH;
+ALTER GIT REPOSITORY SNOWCAMP_LAB.GITREPO.SNOWCAMP_GIT_REPO FETCH;
 
 -- List the Streamlit app files
-LS @SNOWCAMP_LAB.RAW.SNOWCAMP_GIT_REPO/branches/main/streamlit/;
+LS @SNOWCAMP_LAB.GITREPO.SNOWCAMP_GIT_REPO/branches/main/streamlit/;
 
 -- Deploy the standalone Streamlit app
 CREATE OR REPLACE STREAMLIT SNOWCAMP_LAB.ANALYTICS.CLIENT_REPORTING_APP
-    ROOT_LOCATION  = '@SNOWCAMP_LAB.RAW.SNOWCAMP_GIT_REPO/branches/main/streamlit'
+    ROOT_LOCATION  = '@SNOWCAMP_LAB.GITREPO.SNOWCAMP_GIT_REPO/branches/main/streamlit'
     MAIN_FILE      = 'client_reporting_app.py'
     QUERY_WAREHOUSE = WH_LAB
     TITLE          = 'DWS Client Reporting'
@@ -1598,7 +1604,7 @@ day2.append(sql_cell("d2_sql_teardown", """\
 -- DROP RESOURCE MONITOR IF EXISTS LAB_MONITOR;
 
 -- Drop the Git repository and API integration
--- DROP GIT REPOSITORY IF EXISTS SNOWCAMP_LAB.RAW.SNOWCAMP_GIT_REPO;
+-- DROP GIT REPOSITORY IF EXISTS SNOWCAMP_LAB.GITREPO.SNOWCAMP_GIT_REPO;
 -- DROP API INTEGRATION IF EXISTS snowcamp_git_api;
 
 -- Drop the lab database (removes ALL schemas, tables, views)
