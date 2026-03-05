@@ -110,11 +110,19 @@ For more details, see [Compute setup for Notebooks in Workspaces](https://docs.s
 
 ### 4. Import the Day 1 notebook (Workspaces)
 
-> **Screenshots coming soon** -- detailed Workspaces import instructions will be added here.
+1. In the left sidebar, hover over **Projects** and select **Workspaces**
 
-1. Navigate to **Projects** > **Workspaces** in the left sidebar
-2. Create a new Workspace and import `DWS_SnowCamp_Day1.ipynb` from the Git repository
-3. Set the **Query warehouse** to `WH_LAB` and confirm the role is `ACCOUNTADMIN`
+![Projects menu showing Workspaces option](docs/images/12_projects_workspaces_menu.png)
+
+2. In the Workspace dropdown at the top left, select **From Git repository**
+
+![Workspace dropdown with From Git repository highlighted](docs/images/13_from_git_repository.png)
+
+3. In the **Create workspace from Git repository** dialog, enter the repository URL (`https://github.com/sfc-gh-epolano/dws-snowcamp-lab/`), choose a workspace name, select your `SNOWCAMP_GIT_API` integration, and choose **Public repository**. Click **Create**.
+
+![Create workspace from Git repository dialog](docs/images/14_create_workspace_from_git.png)
+
+4. Once the workspace is created, open `notebooks/DWS_SnowCamp_Day1.ipynb` from the file explorer
 
 ### 5. Run Day 1
 
