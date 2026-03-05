@@ -159,7 +159,7 @@ into layers), and a **warehouse** (compute engine that runs our queries).
 
 Think of the warehouse like a cluster of servers that Snowflake spins up on demand \
 and suspends when idle — you only pay for the seconds of compute you actually use. \
-For a lab like this, an `XSMALL` warehouse is more than enough.
+For this lab we use a `MEDIUM` warehouse to keep things responsive.
 
 > **Reference**: \
 [CREATE DATABASE](https://docs.snowflake.com/en/sql-reference/sql/create-database) | \
@@ -182,12 +182,23 @@ CREATE SCHEMA IF NOT EXISTS SNOWCAMP_LAB.MARTS
     COMMENT = 'Gold/Mart layer - business-ready data products';
 
 CREATE WAREHOUSE IF NOT EXISTS WH_LAB
-    WAREHOUSE_SIZE   = 'XSMALL'
+    WAREHOUSE_SIZE   = 'MEDIUM'
     AUTO_SUSPEND     = 60
     AUTO_RESUME      = TRUE
     COMMENT          = 'SnowCamp hands-on lab warehouse';
 
 ALTER ACCOUNT SET CORTEX_ENABLED_CROSS_REGION = 'ANY_REGION';
+
+-- External access integration so the Workspaces compute service can reach the open internet
+CREATE OR REPLACE NETWORK RULE snowcamp_egress_rule
+    MODE       = EGRESS
+    TYPE       = HOST_PORT
+    VALUE_LIST = ('0.0.0.0:443', '0.0.0.0:80');
+
+CREATE OR REPLACE EXTERNAL ACCESS INTEGRATION snowcamp_external_access
+    ALLOWED_NETWORK_RULES         = (snowcamp_egress_rule)
+    ALLOWED_AUTHENTICATION_SECRETS = ()
+    ENABLED                        = TRUE;
 
 USE ROLE ACCOUNTADMIN;
 USE WAREHOUSE WH_LAB;

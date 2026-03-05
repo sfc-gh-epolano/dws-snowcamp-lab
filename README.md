@@ -51,7 +51,7 @@ The lab is split across two sessions, each approximately 1.5 hours. The narrativ
 
 Use the credentials provided at registration.
 
-### 2. Create a Git Repository integration
+### 2. Set up infrastructure and Git integration
 
 Open a **SQL Worksheet** in Snowsight and run:
 
@@ -61,12 +61,23 @@ CREATE DATABASE IF NOT EXISTS SNOWCAMP_LAB;
 CREATE SCHEMA IF NOT EXISTS SNOWCAMP_LAB.RAW;
 
 CREATE WAREHOUSE IF NOT EXISTS WH_LAB
-    WAREHOUSE_SIZE = 'XSMALL'
+    WAREHOUSE_SIZE = 'MEDIUM'
     AUTO_SUSPEND   = 60
     AUTO_RESUME    = TRUE;
 
 -- Enable cross-region inference for Cortex AI features
 ALTER ACCOUNT SET CORTEX_ENABLED_CROSS_REGION = 'ANY_REGION';
+
+-- Allow the Workspaces compute service to reach the open internet
+CREATE OR REPLACE NETWORK RULE snowcamp_egress_rule
+    MODE       = EGRESS
+    TYPE       = HOST_PORT
+    VALUE_LIST = ('0.0.0.0:443', '0.0.0.0:80');
+
+CREATE OR REPLACE EXTERNAL ACCESS INTEGRATION snowcamp_external_access
+    ALLOWED_NETWORK_RULES         = (snowcamp_egress_rule)
+    ALLOWED_AUTHENTICATION_SECRETS = ()
+    ENABLED                        = TRUE;
 
 -- Allow Snowflake to connect to GitHub
 CREATE OR REPLACE API INTEGRATION snowcamp_git_api
@@ -82,7 +93,20 @@ CREATE OR REPLACE GIT REPOSITORY SNOWCAMP_LAB.RAW.SNOWCAMP_GIT_REPO
 ALTER GIT REPOSITORY SNOWCAMP_LAB.RAW.SNOWCAMP_GIT_REPO FETCH;
 ```
 
-### 3. Import the Day 1 notebook (Workspaces)
+### 3. Create a Workspaces notebook service
+
+Before importing the Day 1 notebook, create a notebook service in Workspaces. This provides the compute environment for running Python and SQL cells.
+
+1. Navigate to **Projects** > **Workspaces** in the left sidebar
+2. Open any notebook (or create a temporary one) and select **Connected** in the top bar
+3. Create a new notebook service with the following settings:
+   - **Compute pool**: Select an available compute pool (or use the default)
+   - **Query warehouse**: `WH_LAB`
+   - **External access integrations**: Select `SNOWCAMP_EXTERNAL_ACCESS` to allow the service to reach external endpoints (e.g. `pip install`)
+
+For more details, see [Compute setup for Notebooks in Workspaces](https://docs.snowflake.com/en/user-guide/ui-snowsight/notebooks-in-workspaces/notebooks-in-workspaces-compute-setup).
+
+### 4. Import the Day 1 notebook (Workspaces)
 
 > **Screenshots coming soon** -- detailed Workspaces import instructions will be added here.
 
@@ -90,11 +114,11 @@ ALTER GIT REPOSITORY SNOWCAMP_LAB.RAW.SNOWCAMP_GIT_REPO FETCH;
 2. Create a new Workspace and import `DWS_SnowCamp_Day1.ipynb` from the Git repository
 3. Set the **Query warehouse** to `WH_LAB` and confirm the role is `ACCOUNTADMIN`
 
-### 4. Run Day 1
+### 5. Run Day 1
 
 Execute cells sequentially from top to bottom. Each section includes explanations, SQL/Python code, and links to Snowflake documentation.
 
-### 5. Import the Day 2 notebook (Snowflake Notebook)
+### 6. Import the Day 2 notebook (Snowflake Notebook)
 
 1. Navigate to **Projects** > **Notebooks** in the left sidebar and click the **+** button, then select **Create from Repository**
 
@@ -122,7 +146,7 @@ Execute cells sequentially from top to bottom. Each section includes explanation
 
 7. Back in the create dialog, set the **Query warehouse** to `WH_LAB` and confirm the role is `ACCOUNTADMIN`. Click **Create**.
 
-### 6. Run Day 2
+### 7. Run Day 2
 
 Execute cells sequentially from top to bottom. Day 2 uses a Snowflake Notebook to enable inline Streamlit widgets.
 
