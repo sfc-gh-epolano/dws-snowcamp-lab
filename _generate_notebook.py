@@ -1069,7 +1069,7 @@ ORDER BY object_name;"""))
 
 day2.append(md_cell("d2_part1", """\
 ---
-## Part 1: Streamlit Dashboard (25 min)
+## Part 1: Streamlit Dashboard (20 min)
 
 Now let's turn those carefully built mart tables into something a portfolio \
 manager or client would actually see: an **interactive dashboard**. Streamlit \
@@ -1206,7 +1206,7 @@ SHOW STREAMLITS IN SCHEMA SNOWCAMP_LAB.ANALYTICS;"""))
 
 day2.append(md_cell("d2_part2", """\
 ---
-## Part 2: Horizon Catalog & Internal Marketplace (10 min)
+## Part 2: Horizon Catalog & Internal Marketplace (40 min)
 
 Yesterday we consumed data from the Marketplace. Now let's flip the script and \
 become **data publishers**. In a large organisation like DWS, different teams \
@@ -1366,7 +1366,7 @@ installed the Snowflake Public Data listing in Day 1.
 
 day2.append(md_cell("d2_part3", """\
 ---
-## Part 3: Platform Administration & Monitoring (15 min)
+## Part 3: Platform Administration & Monitoring (20 min)
 
 As a platform team, you are not just building data products — you are also \
 responsible for keeping the platform healthy, cost-effective, and secure. \

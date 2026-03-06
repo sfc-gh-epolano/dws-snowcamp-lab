@@ -40,9 +40,9 @@ The lab is split across two sessions, each approximately 1.5 hours. The narrativ
 
 | Part | Topic | Duration | What You Build |
 |------|-------|----------|----------------|
-| 1 | Streamlit Dashboard | 25 min | Inline dashboard + standalone Streamlit app |
-| 2 | Horizon Catalog & Internal Marketplace | 10 min | Horizon tags, share, data product listing |
-| 3 | Platform Administration | 15 min | Credit monitoring, query analysis, resource monitors |
+| 1 | Streamlit Dashboard | 20 min | Inline dashboard + standalone Streamlit app |
+| 2 | Horizon Catalog & Internal Marketplace | 40 min | Horizon tags, share, data product listing |
+| 3 | Platform Administration | 20 min | Credit monitoring, query analysis, resource monitors |
 | 4 | Cortex Code: What's Next | 10 min | AI-assisted development ideas and prompts |
 
 ## Quick Start
