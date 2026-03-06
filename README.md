@@ -158,7 +158,6 @@ RAW.CLIENTS (30 rows)           RAW.SECURITIES (50 rows)
 | ACCOUNT_USAGE Views | https://docs.snowflake.com/en/sql-reference/account-usage |
 | Resource Monitors | https://docs.snowflake.com/en/user-guide/resource-monitors |
 | Git Repository Integration | https://docs.snowflake.com/en/developer-guide/git/git-setting-up |
-| Snowflake Public Data (Free) | https://app.snowflake.com/marketplace/listing/GZTSZAS2KCS |
 | Cortex Code | https://docs.snowflake.com/en/user-guide/cortex-code/cortex-code-snowsight |
 | Introduction to Tasks | https://docs.snowflake.com/en/user-guide/tasks-intro |
 | OpenFlow (reference only) | https://docs.snowflake.com/en/user-guide/data-load-openflow |
