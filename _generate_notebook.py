@@ -1297,16 +1297,64 @@ SHOW SHARES LIKE 'SNOWCAMP%';"""))
 day2.append(md_cell("d2_md_marketplace_ui", """\
 ### Publishing to the Internal Marketplace (UI)
 
-To publish your share as a discoverable listing in the Internal Marketplace:
+Now let's publish your share as a discoverable **data product** in the Internal \
+Marketplace. Open a **new browser tab** so you don't interrupt your notebook session.
 
-1. Navigate to **Data Products** → **Private Sharing**
-2. Click **Share** → select `SNOWCAMP_CLIENT_REPORTING_SHARE`
-3. Add a title and description, set visibility to **Internal**
-4. Publish
+#### Step 1: Navigate to Internal Sharing
 
-Other teams in your organisation can then discover and install this data product \
-with a single click — just like you installed the Snowflake Public Data listing \
-in Day 1.
+In the Snowsight sidebar, go to **Horizon Catalog** → **Data sharing** → \
+**Internal sharing**.
+
+#### Step 2: Create a Listing
+
+1. Click the **Listings** tab at the top.
+2. Click **Create Listing**.
+3. For the listing title, enter: \
+`DWS Client Reporting Data Product - YOUR_FIRST_NAME YOUR_LAST_NAME`
+
+#### Step 3: Add Your Data Product
+
+1. Click the blue **Add Data Product** button.
+2. Click **+ Select**, then find and select `SNOWCAMP_CLIENT_REPORTING_SHARE`.
+3. Click **Save**.
+
+#### Step 4: Configure Access Control
+
+1. Click **+ Access Control**.
+2. For **"Who can access this data product?"** — choose \
+**No accounts or roles are pre-approved** (data will only be available by request).
+3. For **"Who else can discover the listing and request access?"** — choose \
+**Selected accounts and roles**.
+4. From the dropdown, find and select **your own account**.
+
+> **Note**: In a real deployment, this is where you would choose the specific \
+accounts or roles that should be able to discover and request access to your \
+data product.
+
+#### Step 5: Set Up Request Approval
+
+1. Click **Set up request approval flow**.
+2. For **"How should the request approval happen?"** — choose \
+**Manage Requests in Snowflake**.
+3. For **"Approver email for notifications"** — select **Use Custom Email** and \
+enter your own email address.
+4. Click **Save** to return to the listing page.
+
+#### Step 6: Add Support Contact and Publish
+
+1. Click **Add Support Contact** and enter your own email address.
+2. Click the **Publish** button in the top right corner.
+3. Click **Done** in the confirmation prompt.
+
+#### Step 7: Find Your Published Listing
+
+1. In the sidebar, go to **Horizon Catalog** → **Catalog** → **Internal Marketplace**.
+2. Sort listings by **Most Recent** (the sort button is next to the Create Listing \
+button) and find your listing.
+
+Congratulations — you have built and shared your own data product! Other teams \
+in your organisation can now discover and request access to it, just like you \
+installed the Snowflake Public Data listing in Day 1.
 
 > **Reference**: \
 [Creating Listings](https://docs.snowflake.com/en/user-guide/data-marketplace-listings) | \
