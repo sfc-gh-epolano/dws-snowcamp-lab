@@ -51,34 +51,33 @@ The lab is split across two sessions, each approximately 1.5 hours. The narrativ
 
 Register and get your lab credentials at [https://go.dataops.live/dws-snowcamp/register](https://go.dataops.live/dws-snowcamp/register). Your Snowflake account, database, warehouse, Git integration, and notebooks are pre-deployed automatically by the Hands-On Lab pipeline.
 
-### 2. Create a Workspaces notebook service
+### 2. Import the Day 1 notebook (Workspaces)
+
+1. In the left sidebar, hover over **Projects** and select **Workspaces**
+
+![Snowsight sidebar with Projects expanded and Workspaces highlighted](docs/images/15_projects_menu.png)
+
+2. In the Workspace dropdown at the top left, select **From Git repository**
+
+![Workspace dropdown with From Git repository highlighted](docs/images/12_projects_workspaces_menu.png)
+
+3. In the **Create workspace from Git repository** dialog, enter the repository URL (`https://github.com/sfc-gh-epolano/dws-snowcamp-lab/`), choose a workspace name, select your `SNOWCAMP_GIT_API` integration, and choose **Public repository**. Click **Create**.
+
+![Create workspace from Git repository dialog](docs/images/13_from_git_repository.png)
+
+4. Once the workspace is created, open `notebooks/DWS_SnowCamp_Day1.ipynb` from the file explorer
+
+### 3. Create a Workspaces notebook service
 
 Before running the Day 1 notebook, create a notebook service in Workspaces. This provides the compute environment for running Python and SQL cells.
 
-1. Navigate to **Projects** > **Workspaces** in the left sidebar
-2. Open any notebook (or create a temporary one) and select **Connected** in the top bar
-3. Create a new notebook service with the following settings:
+1. Open any notebook (or create a temporary one) and select **Connected** in the top bar
+2. Create a new notebook service with the following settings:
    - **Compute pool**: Select an available compute pool (or use the default)
    - **Query warehouse**: `WH_LAB`
    - **External access integrations**: Select `SNOWCAMP_EXTERNAL_ACCESS` to allow the service to reach external endpoints (e.g. `pip install`)
 
 For more details, see [Compute setup for Notebooks in Workspaces](https://docs.snowflake.com/en/user-guide/ui-snowsight/notebooks-in-workspaces/notebooks-in-workspaces-compute-setup).
-
-### 3. Import the Day 1 notebook (Workspaces)
-
-1. In the left sidebar, hover over **Projects** and select **Workspaces**
-
-![Projects menu showing Workspaces option](docs/images/12_projects_workspaces_menu.png)
-
-2. In the Workspace dropdown at the top left, select **From Git repository**
-
-![Workspace dropdown with From Git repository highlighted](docs/images/13_from_git_repository.png)
-
-3. In the **Create workspace from Git repository** dialog, enter the repository URL (`https://github.com/sfc-gh-epolano/dws-snowcamp-lab/`), choose a workspace name, select your `SNOWCAMP_GIT_API` integration, and choose **Public repository**. Click **Create**.
-
-![Create workspace from Git repository dialog](docs/images/14_create_workspace_from_git.png)
-
-4. Once the workspace is created, open `notebooks/DWS_SnowCamp_Day1.ipynb` from the file explorer
 
 ### 4. Run Day 1
 
