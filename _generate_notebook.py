@@ -1032,9 +1032,9 @@ By the end of today you will have:
 
 | Day 2 | Topic | Duration |
 |-------|-------|----------|
-| 1 | Streamlit Dashboard | 25 min |
-| 2 | Horizon Catalog & Internal Marketplace | 10 min |
-| 3 | Platform Administration & Monitoring | 15 min |
+| 1 | Streamlit Dashboard | 20 min |
+| 2 | Horizon Catalog & Internal Marketplace | 40 min |
+| 3 | Platform Administration & Monitoring | 20 min |
 | 4 | Cortex Code: What's Next | 10 min |
 
 > **Important**: This notebook runs in a **Snowflake Notebook** (Projects → Notebooks), \
