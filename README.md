@@ -47,57 +47,13 @@ The lab is split across two sessions, each approximately 1.5 hours. The narrativ
 
 ## Quick Start
 
-### 1. Log in to your Snowflake trial account
+### 1. Log in to your Snowflake account
 
-Use the credentials provided at registration.
+Register and get your lab credentials at [https://go.dataops.live/dws-snowcamp/register](https://go.dataops.live/dws-snowcamp/register). Your Snowflake account, database, warehouse, Git integration, and notebooks are pre-deployed automatically by the Hands-On Lab pipeline.
 
-### 2. Set up infrastructure and Git integration
+### 2. Create a Workspaces notebook service
 
-Open a **SQL Worksheet** in Snowsight and run:
-
-```sql
--- Create the lab database and warehouse
-CREATE DATABASE IF NOT EXISTS SNOWCAMP_LAB;
-CREATE SCHEMA IF NOT EXISTS SNOWCAMP_LAB.RAW;
-CREATE SCHEMA IF NOT EXISTS SNOWCAMP_LAB.GITREPO;
-CREATE SCHEMA IF NOT EXISTS SNOWCAMP_LAB.NOTEBOOKS;
-
-CREATE WAREHOUSE IF NOT EXISTS WH_LAB
-    WAREHOUSE_SIZE = 'MEDIUM'
-    AUTO_SUSPEND   = 60
-    AUTO_RESUME    = TRUE;
-
--- Enable cross-region inference for Cortex AI features
-ALTER ACCOUNT SET CORTEX_ENABLED_CROSS_REGION = 'ANY_REGION';
-
--- Allow the Workspaces compute service to reach the open internet
-CREATE OR REPLACE NETWORK RULE snowcamp_egress_rule
-    MODE       = EGRESS
-    TYPE       = HOST_PORT
-    VALUE_LIST = ('0.0.0.0:443', '0.0.0.0:80');
-
-CREATE OR REPLACE EXTERNAL ACCESS INTEGRATION snowcamp_external_access
-    ALLOWED_NETWORK_RULES         = (snowcamp_egress_rule)
-    ALLOWED_AUTHENTICATION_SECRETS = ()
-    ENABLED                        = TRUE;
-
--- Allow Snowflake to connect to GitHub
-CREATE OR REPLACE API INTEGRATION snowcamp_git_api
-    API_PROVIDER         = git_https_api
-    API_ALLOWED_PREFIXES = ('https://github.com/')
-    ENABLED              = TRUE;
-
--- Point to this repository
-CREATE OR REPLACE GIT REPOSITORY SNOWCAMP_LAB.GITREPO.SNOWCAMP_GIT_REPO
-    API_INTEGRATION = snowcamp_git_api
-    ORIGIN          = 'https://github.com/sfc-gh-epolano/dws-snowcamp-lab.git';
-
-ALTER GIT REPOSITORY SNOWCAMP_LAB.GITREPO.SNOWCAMP_GIT_REPO FETCH;
-```
-
-### 3. Create a Workspaces notebook service
-
-Before importing the Day 1 notebook, create a notebook service in Workspaces. This provides the compute environment for running Python and SQL cells.
+Before running the Day 1 notebook, create a notebook service in Workspaces. This provides the compute environment for running Python and SQL cells.
 
 1. Navigate to **Projects** > **Workspaces** in the left sidebar
 2. Open any notebook (or create a temporary one) and select **Connected** in the top bar
@@ -108,7 +64,7 @@ Before importing the Day 1 notebook, create a notebook service in Workspaces. Th
 
 For more details, see [Compute setup for Notebooks in Workspaces](https://docs.snowflake.com/en/user-guide/ui-snowsight/notebooks-in-workspaces/notebooks-in-workspaces-compute-setup).
 
-### 4. Import the Day 1 notebook (Workspaces)
+### 3. Import the Day 1 notebook (Workspaces)
 
 1. In the left sidebar, hover over **Projects** and select **Workspaces**
 
@@ -124,41 +80,13 @@ For more details, see [Compute setup for Notebooks in Workspaces](https://docs.s
 
 4. Once the workspace is created, open `notebooks/DWS_SnowCamp_Day1.ipynb` from the file explorer
 
-### 5. Run Day 1
+### 4. Run Day 1
 
 Execute cells sequentially from top to bottom. Each section includes explanations, SQL/Python code, and links to Snowflake documentation.
 
-### 6. Import the Day 2 notebook (Snowflake Notebook)
+### 5. Run Day 2
 
-1. Navigate to **Projects** > **Notebooks** in the left sidebar and click the **+** button, then select **Create from Repository**
-
-![Create notebook from repository](docs/images/01_create_from_repo.png)
-
-2. Click **Select .ipynb file** to open the file picker. You will be prompted to select the database that contains your Git repository.
-
-![Select database](docs/images/02_select_database.png)
-
-3. Select `SNOWCAMP_LAB` from the database dropdown. You will see `SNOWCAMP_GIT_REPO` appear in the left panel. Click on it.
-
-![Database selected](docs/images/03_database_selected.png)
-
-4. The repository contents will load. You should see the `dbt`, `notebooks`, and `streamlit` folders.
-
-![Repository contents](docs/images/04_repo_contents.png)
-
-5. Click the **notebooks** folder.
-
-![Click notebooks folder](docs/images/05_click_notebooks.png)
-
-6. Select **`DWS_SnowCamp_Day2.ipynb`** and click **Select file**.
-
-![Select notebook file](docs/images/06_select_notebook.png)
-
-7. Back in the create dialog, set the **Query warehouse** to `WH_LAB` and confirm the role is `ACCOUNTADMIN`. Click **Create**.
-
-### 7. Run Day 2
-
-Execute cells sequentially from top to bottom. Day 2 uses a Snowflake Notebook to enable inline Streamlit widgets.
+Day 2 covers Streamlit dashboards, Horizon Catalog, platform administration, and Cortex Code. The notebook (`DWS_SnowCamp_Day2.ipynb`) is pre-deployed by the Hands-On Lab pipeline — open it from **Projects** > **Notebooks** and execute cells sequentially from top to bottom.
 
 ## Repository Structure
 
