@@ -897,7 +897,7 @@ DBT PROJECT` inside a Task, we get a fully automated, production-grade pipeline 
 that:
 - Runs every hour (or whatever schedule you choose)
 - Uses the `WH_LAB` warehouse for compute
-- Can be monitored in the Snowsight UI under **Activity → Task History**
+- Can be monitored in the Snowsight UI via **Catalog → Database Explorer** — select the database and schema, then choose **Tasks** to view and manage the task
 - Sends notifications on failure if configured
 
 Let's create and start a Task now. We will schedule it to run every hour, but \
