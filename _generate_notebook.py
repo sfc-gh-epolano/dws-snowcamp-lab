@@ -456,24 +456,14 @@ with a single SQL JOIN instead of a complex data pipeline.
 
 ### Install Snowflake Public Data (Free)
 
-1. In Snowsight, navigate to **Data Products** → **Marketplace** and search for \
-**Snowflake Public Data (Free)**
+Follow the step-by-step instructions in the **Hands-On Lab Instructions** \
+(Step 3b) to install the **Snowflake Public Data (Free)** listing from the \
+Snowflake Marketplace. The instructions include screenshots to guide you through \
+the process.
 
-![Search Marketplace]({IMG}/07_marketplace_search.png)
-
-2. Click on the **Snowflake Public Data (Free)** listing from **Snowflake Public Data Products**
-
-![Snowflake Public Data listing]({IMG}/08_snowflake_public_data_listing.png)
-
-3. Click **Get** to open the install dialog
-
-![Get listing]({IMG}/09_get_listing.png)
-
-4. Expand **Options**, confirm the database name is `FINANCIAL__ECONOMIC_ESSENTIALS`, then click **Get**
-
-![Get listing with options]({IMG}/10_get_listing_options.png)
-
-5. The database will appear in your account with **no storage cost** (zero-copy data sharing)
+Once installed, the database `FINANCIAL__ECONOMIC_ESSENTIALS` will appear in \
+your account with **no storage cost** (zero-copy data sharing). Then return here \
+and continue with the next cell.
 
 > **Reference**: \
 [Snowflake Marketplace](https://docs.snowflake.com/en/user-guide/data-marketplace)"""))
