@@ -1187,6 +1187,8 @@ click the URL from `SHOW STREAMLITS`.
 [Streamlit in Snowflake Overview](https://docs.snowflake.com/en/developer-guide/streamlit/about-streamlit)"""))
 
 day2.append(sql_cell("d2_sql_create_streamlit", """\
+USE ROLE ACCOUNTADMIN;
+
 -- Make sure we have the latest repo content
 ALTER GIT REPOSITORY SNOWCAMP_LAB.GITREPO.SNOWCAMP_GIT_REPO FETCH;
 
