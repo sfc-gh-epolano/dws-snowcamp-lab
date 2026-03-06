@@ -166,6 +166,9 @@ For this lab we use a `MEDIUM` warehouse to keep things responsive.
 [CREATE WAREHOUSE](https://docs.snowflake.com/en/sql-reference/sql/create-warehouse)"""))
 
 day1.append(sql_cell("d1_sql_setup", """\
+USE ROLE ACCOUNTADMIN;
+USE WAREHOUSE WH_LAB;
+
 -- =============================================================
 -- Create our lab database with three schemas (one per layer)
 -- =============================================================
